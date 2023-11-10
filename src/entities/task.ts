@@ -12,8 +12,8 @@ export class Task {
   @Column({ nullable: false, unique: false })
   type!: string;
 
-  @Column({ nullable: true })
-  completedAt!: Date | null;
+  @Column({ type: 'timestamptz', nullable: true })
+  completedAt!: string | null;
 
   @Column({ nullable: false })
   cost!: number;

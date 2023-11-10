@@ -20,8 +20,8 @@ export class Bed {
   @ManyToOne((type) => User, (user) => user.beds)
   user!: User;
 
-  @Column({ nullable: true })
-  plantedAt!: Date | null;
+  @Column({ type: 'timestamptz', nullable: true })
+  plantedAt!: string | null;
 
   @Column({ nullable: false, unique: false })
   content!: string;
