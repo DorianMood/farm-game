@@ -46,10 +46,12 @@ const create = async (
     for (let i = 0; i < 10; i++) {
       const newBed = new Bed();
       newBed.index = i;
-      newBed.user = newUser;
+      newBed.content = '';
+
+      await queryRunner.manager.save(newBed);
+
       newBeds.push(newBed);
     }
-
     newUser.beds = newBeds;
 
     await queryRunner.manager.save(newUser);
