@@ -6,7 +6,9 @@ const retrieve = async (req: Request, res: Response) => {
   const bedsQuesryBuilder =
     AppDataSource.getRepository(Bed).createQueryBuilder('bed');
 
-  const beds = await bedsQuesryBuilder.getMany();
+  const beds = await bedsQuesryBuilder
+    .where('bed.user = :userId', { userId: req.user?.id })
+    .getMany();
 
   return res.json(beds);
 };
