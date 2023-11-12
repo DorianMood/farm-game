@@ -46,7 +46,6 @@ const create = async (
     for (let i = 0; i < 10; i++) {
       const newBed = new Bed();
       newBed.index = i;
-      newBed.content = '';
 
       await queryRunner.manager.save(newBed);
 

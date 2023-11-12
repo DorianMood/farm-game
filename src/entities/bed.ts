@@ -23,13 +23,11 @@ export class Bed {
   @Column({ type: 'timestamptz', nullable: true })
   plantedAt!: string | null;
 
-  @Column({ nullable: false, unique: false })
-  content!: string;
-
   @Column({
     type: 'enum',
     enum: CropEnum,
-    default: CropEnum.Carrot,
+    nullable: true,
+    default: null,
   })
-  crop!: string;
+  crop!: string | null;
 }

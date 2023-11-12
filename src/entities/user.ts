@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import bcrypt from 'bcryptjs';
 import { Bed } from './bed';
-import { Task } from './task';
+import { UserTask } from './user-task';
 
 @Entity()
 export class User {
@@ -40,8 +40,11 @@ export class User {
   @OneToMany((type) => Bed, (bed) => bed.user)
   beds!: Bed[];
 
-  @OneToMany((type) => Task, (task) => task.user)
-  tasks!: Task[];
+  @Column({ nullable: false, default: 0 })
+  ballance!: number;
+
+  @OneToMany((type) => UserTask, (task) => task.user)
+  tasks!: UserTask[];
 
   setPassword(password: string) {
     this.salt = bcrypt.genSaltSync(12);

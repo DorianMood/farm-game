@@ -1,19 +1,16 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { User } from './user';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { UserTask } from './user-task';
 
 @Entity()
 export class Task {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @ManyToOne((type) => User, (user) => user.tasks)
-  user!: User;
+  @OneToMany((type) => UserTask, (userTask) => userTask.task)
+  userTask!: UserTask[];
 
   @Column({ nullable: false, unique: false })
   type!: string;
-
-  @Column({ type: 'timestamptz', nullable: true })
-  completedAt!: string | null;
 
   @Column({ nullable: false })
   cost!: number;
