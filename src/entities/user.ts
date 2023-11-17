@@ -43,7 +43,7 @@ export class User {
   @Column({ nullable: false, default: 0 })
   ballance!: number;
 
-  @OneToMany((type) => UserTask, (task) => task.user)
+  @OneToMany((type) => UserTask, (task) => task.user, { cascade: true })
   tasks!: UserTask[];
 
   setPassword(password: string) {

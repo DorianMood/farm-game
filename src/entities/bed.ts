@@ -2,11 +2,11 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './user';
 
 export enum CropEnum {
-  Carrot,
-  Potato,
-  Beet,
-  Wheat,
-  Flower,
+  Carrot = 'Carrot',
+  Potato = 'Potato',
+  Beet = 'Beet',
+  Wheat = 'Wheat',
+  Flower = 'Flower',
 }
 
 @Entity()
@@ -17,7 +17,10 @@ export class Bed {
   @Column({ nullable: false })
   index!: number;
 
-  @ManyToOne((type) => User, (user) => user.beds)
+  @ManyToOne((type) => User, (user) => user.beds, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   user!: User;
 
   @Column({ type: 'timestamptz', nullable: true })
