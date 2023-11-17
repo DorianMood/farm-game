@@ -1,0 +1,1 @@
+export const BED_GROWING_TIMEOUT = 86400000;
