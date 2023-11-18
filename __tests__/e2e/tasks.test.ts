@@ -67,17 +67,39 @@ describe('Tasks routes', () => {
   test('Complete task for an authentificated user', async () => {
     const { agent } = await createAuthenticatedAgent(server);
 
-    const res = await agent.post('/api/tasks/complete').send({ id: '123' });
+    const tasksResponse = await agent.get('/api/tasks');
 
-    expect(res.statusCode).toEqual(200);
+    const tasks: UserTask[] = tasksResponse.body;
+
+    const taskToComplete = tasks.find((task) => task.completedAt === null);
+
+    if (taskToComplete) {
+      const res = await agent
+        .post('/api/tasks/complete')
+        .send({ id: taskToComplete.id });
+
+      expect(res.statusCode).toEqual(200);
+    }
   });
 
   test('Complete task fails if the task is already completed', async () => {
     const { agent } = await createAuthenticatedAgent(server);
 
-    const res = await agent.post('/api/tasks/complete/').send({ id: '123' });
+    const tasksResponse = await agent.get('/api/tasks');
 
-    expect(res.statusCode).toEqual(409);
+    const tasks: UserTask[] = tasksResponse.body;
+
+    const taskToComplete = tasks.find((task) => task.completedAt === null);
+
+    if (taskToComplete) {
+      await agent.post('/api/tasks/complete').send({ id: taskToComplete.id });
+
+      const res = await agent
+        .post('/api/tasks/complete')
+        .send({ id: taskToComplete.id });
+
+      expect(res.statusCode).toEqual(409);
+    }
   });
 
   test('Throw and error if not authentificated user tries to fail a task', async () => {
@@ -105,16 +127,38 @@ describe('Tasks routes', () => {
   test('Fail task for an authentificated user', async () => {
     const { agent } = await createAuthenticatedAgent(server);
 
-    const res = await agent.post('/api/tasks/fail').send({ id: '123' });
+    const tasksResponse = await agent.get('/api/tasks');
 
-    expect(res.statusCode).toEqual(200);
+    const tasks: UserTask[] = tasksResponse.body;
+
+    const taskToFail = tasks.find((task) => task.completedAt === null);
+
+    if (taskToFail) {
+      const res = await agent
+        .post('/api/tasks/fail')
+        .send({ id: taskToFail.id });
+
+      expect(res.statusCode).toEqual(200);
+    }
   });
 
   test('Fail task fails if the task is already completed', async () => {
     const { agent } = await createAuthenticatedAgent(server);
 
-    const res = await agent.post('/api/tasks/fail').send({ id: '123' });
+    const tasksResponse = await agent.get('/api/tasks');
 
-    expect(res.statusCode).toEqual(409);
+    const tasks: UserTask[] = tasksResponse.body;
+
+    const taskToFail = tasks.find((task) => task.completedAt === null);
+
+    if (taskToFail) {
+      await agent.post('/api/tasks/fail').send({ id: taskToFail.id });
+
+      const res = await agent
+        .post('/api/tasks/fail')
+        .send({ id: taskToFail.id });
+
+      expect(res.statusCode).toEqual(409);
+    }
   });
 });

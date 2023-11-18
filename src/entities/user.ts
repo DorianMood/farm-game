@@ -38,7 +38,7 @@ export class User {
   @Column({ nullable: false })
   salt!: string;
 
-  @OneToMany((type) => Bed, (bed) => bed.user)
+  @OneToMany((type) => Bed, (bed) => bed.user, { cascade: true })
   beds!: Bed[];
 
   @Column({ nullable: false, default: 0 })
@@ -57,4 +57,3 @@ export class User {
     return hash === this.hashPassword;
   }
 }
-

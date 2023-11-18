@@ -1,4 +1,5 @@
 import createHttpError from 'http-errors';
+import validator from 'validator';
 
 import type {
   TasksCompleteBody,
@@ -14,6 +15,9 @@ export const validateCompleteBody = (body: Partial<TasksCompleteBody>) => {
   if (typeof id !== 'string') {
     throw createHttpError(400, 'Task id must be string');
   }
+  if (!validator.isUUID(id)) {
+    throw createHttpError(400, 'Task id must be uuid');
+  }
 
   return body as TasksCompleteBody;
 };
@@ -26,6 +30,9 @@ export const validateFailBody = (body: Partial<TasksFailBody>) => {
   }
   if (typeof id !== 'string') {
     throw createHttpError(400, 'Task id must be string');
+  }
+  if (!validator.isUUID(id)) {
+    throw createHttpError(400, 'Task id must be uuid');
   }
 
   return body as TasksCompleteBody;

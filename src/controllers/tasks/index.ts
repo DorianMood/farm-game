@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import createHttpError from 'http-errors';
-import { LessThan, Not } from 'typeorm';
+import { LessThan, IsNull } from 'typeorm';
 
 import { User } from '../../../src/entities/user';
 import { UserTask } from '../../../src/entities/user-task';
@@ -54,10 +54,20 @@ const complete = async (req: Request, res: Response) => {
     }
 
     const taskNotCompleted = await userTaskRepo.find({
-      where: {
-        id,
-        user: { id: user.id },
-        completedAt: LessThan(new Date(Date.now() - 123).toISOString()),
+      where: [
+        {
+          id,
+          user: { id: user.id },
+          completedAt: LessThan(new Date(Date.now() - 123).toISOString()),
+        },
+        {
+          id,
+          user: { id: user.id },
+          completedAt: IsNull(),
+        },
+      ],
+      relations: {
+        task: true,
       },
     });
 
@@ -68,7 +78,7 @@ const complete = async (req: Request, res: Response) => {
     await queryRunner.manager.update(
       UserTask,
       { id, user },
-      { completedAt: new Date().toISOString() },
+      { completedAt: new Date().toISOString() }
     );
 
     await queryRunner.manager.update(User, user, {
@@ -120,10 +130,20 @@ const fail = async (req: Request, res: Response) => {
     }
 
     const taskNotCompleted = await userTaskRepo.find({
-      where: {
-        id,
-        user: { id: user.id },
-        completedAt: Not(LessThan(new Date(Date.now() - 123).toISOString())),
+      where: [
+        {
+          id,
+          user: { id: user.id },
+          completedAt: LessThan(new Date(Date.now() - 123).toISOString()),
+        },
+        {
+          id,
+          user: { id: user.id },
+          completedAt: IsNull(),
+        },
+      ],
+      relations: {
+        task: true,
       },
     });
 
@@ -134,11 +154,14 @@ const fail = async (req: Request, res: Response) => {
     await queryRunner.manager.update(
       UserTask,
       { id, user },
-      { completedAt: new Date().toISOString() },
+      { completedAt: new Date().toISOString() }
     );
 
     await queryRunner.manager.update(User, user, {
-      ballance: user.ballance - taskNotCompleted[0].task.cost / 2,
+      ballance: Math.max(
+        0,
+        user.ballance - Math.round(taskNotCompleted[0].task.cost / 2)
+      ),
     });
 
     await queryRunner.commitTransaction();

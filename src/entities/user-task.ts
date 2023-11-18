@@ -8,16 +8,10 @@ export class UserTask {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @ManyToOne((type) => User, (user) => user.tasks, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
+  @ManyToOne((type) => User, (user) => user.tasks)
   user!: User;
 
-  @ManyToOne((type) => Task, (task) => task.userTask, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
+  @ManyToOne((type) => Task, (task) => task.userTask)
   task!: Task;
 
   @Column({ type: 'timestamptz', nullable: true })
