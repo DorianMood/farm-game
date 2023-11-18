@@ -1,4 +1,4 @@
-import { CropEnum } from 'src/entities/bed';
+import type { CropEnum } from '../../../src/entities/bed';
 
 export interface BedsHarvestBody {
   index: number;
