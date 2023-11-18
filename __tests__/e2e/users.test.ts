@@ -4,6 +4,7 @@ import request from 'supertest';
 import { AppDataSource } from '../../src/data-source';
 import { User } from '../../src/entities/user';
 import type { Bed } from '../../src/entities/bed';
+import { Task } from '../../src/entities/task';
 import {
   clearDatabase,
   closeDatabase,
@@ -98,7 +99,7 @@ describe('Users routes', () => {
 
     expect(res6.statusCode).toEqual(400);
     expect(res6.body.message).toEqual(
-      'Password must contain at least 8 characters',
+      'Password must contain at least 8 characters'
     );
   });
 
@@ -137,5 +138,25 @@ describe('Users routes', () => {
 
     expect(res.statusCode).toEqual(200);
     expect(beds).toHaveLength(10);
+  });
+
+  test('Create tasks for a new user user', async () => {
+    const username = 'fakeUser';
+    const email = 'fakeUser@gmail.com';
+    const password = 'fakeUserPwd';
+
+    await request(server)
+      .post('/api/users')
+      .send({ username, email, password });
+
+    const { agent } = await createAuthenticatedAgent(server);
+
+    const res = await agent.get('/api/tasks/');
+    const tasks: Task[] = res.body;
+
+    console.log(tasks);
+
+    expect(res.statusCode).toEqual(200);
+    expect(tasks).toHaveLength(1);
   });
 });

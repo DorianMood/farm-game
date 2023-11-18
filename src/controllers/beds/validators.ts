@@ -29,9 +29,6 @@ export const validatePlantBody = (body: Partial<BedsPlantBody>) => {
   if (crop === undefined) {
     throw createHttpError(400, 'Crop required');
   }
-  if (!Number.isInteger(crop)) {
-    throw createHttpError(400, 'Crop must be integer');
-  }
   if (!(crop in CropEnum)) {
     throw createHttpError(400, `Crop must be in enum ${CropEnum}`);
   }

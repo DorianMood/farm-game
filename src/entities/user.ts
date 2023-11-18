@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import bcrypt from 'bcryptjs';
+
 import { Bed } from './bed';
 import { UserTask } from './user-task';
 
@@ -56,3 +57,4 @@ export class User {
     return hash === this.hashPassword;
   }
 }
+

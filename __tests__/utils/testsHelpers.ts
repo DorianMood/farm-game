@@ -5,22 +5,29 @@ import type { Express } from 'express';
 
 import createServer from '../../src/config/server';
 import { AppDataSource } from '../../src/data-source';
+import { TaskEnum } from '../../src/entities/task';
+import type { User } from '../../src/entities/user';
 import type { TestUserProps } from './userHelpers';
 import { createTestUser } from './userHelpers';
+import { createTestTask, createUserTestTask } from './taskHelpers';
+import { createBeds } from './bedsHelpers';
 
 interface OverrideExpressOptions {
-    logout?: (cb: any) => unknown;
-    logIn?: (user: any, cb: any) => unknown;
+  logout?: (cb: any) => unknown;
+  logIn?: (user: any, cb: any) => unknown;
 }
 
-const overrideExpressServer = (server: Express, overrideExpressOptions: OverrideExpressOptions) => {
-    if (overrideExpressOptions.logout) {
-        server.request.logOut = overrideExpressOptions.logout;
-    }
-    if (overrideExpressOptions.logIn) {
-        server.request.logIn = overrideExpressOptions.logIn;
-    }
-    return server;
+const overrideExpressServer = (
+  server: Express,
+  overrideExpressOptions: OverrideExpressOptions,
+) => {
+  if (overrideExpressOptions.logout) {
+    server.request.logOut = overrideExpressOptions.logout;
+  }
+  if (overrideExpressOptions.logIn) {
+    server.request.logIn = overrideExpressOptions.logIn;
+  }
+  return server;
 };
 
 /**
@@ -30,32 +37,38 @@ const overrideExpressServer = (server: Express, overrideExpressOptions: Override
  * @param overrideExpressOptions - Object used to override Express. Optional.
  * @returns The created test server.
  */
-export const createTestServer = async (port = 7777, preventDatabaseConnection = false, overrideExpressOptions?: OverrideExpressOptions) => {
-    const server = createServer();
-    if (overrideExpressOptions) {
-        overrideExpressServer(server, overrideExpressOptions);
-    }
+export const createTestServer = async (
+  port = 7777,
+  preventDatabaseConnection = false,
+  overrideExpressOptions?: OverrideExpressOptions,
+) => {
+  const server = createServer();
+  if (overrideExpressOptions) {
+    overrideExpressServer(server, overrideExpressOptions);
+  }
 
-    if (!preventDatabaseConnection) {
-        await AppDataSource.initialize();
-    }
+  if (!preventDatabaseConnection) {
+    await AppDataSource.initialize();
+  }
 
-    return server.listen(port);
+  return server.listen(port);
 };
 
 /**
  * Close the database connection.
  */
 export const closeDatabase = async () => {
-    await AppDataSource.destroy();
+  await AppDataSource.destroy();
 };
 
 /**
  * Clear the database data.
  */
 export const clearDatabase = async () => {
-    const entities = AppDataSource.entityMetadatas.map((entity) => `"${entity.tableName}"`).join(', ');
-    await AppDataSource.query(`TRUNCATE ${entities} CASCADE;`);
+  const entities = AppDataSource.entityMetadatas
+    .map((entity) => `"${entity.tableName}"`)
+    .join(', ');
+  await AppDataSource.query(`TRUNCATE ${entities} CASCADE;`);
 };
 
 /**
@@ -64,10 +77,25 @@ export const clearDatabase = async () => {
  * @param testUser - The authenticated user informations. Optional.
  * @returns The created agent.
  */
-export const createAuthenticatedAgent = async (server: Server, testUser?: TestUserProps) => {
-    const userAgent = request.agent(server);
-    const user = await createTestUser(testUser);
-    await userAgent.post('/api/auth/login').send({ login: user.username, password: testUser?.password || 'password' });
+export const createAuthenticatedAgent = async (
+  server: Server,
+  testUser?: TestUserProps,
+) => {
+  const userAgent = request.agent(server);
+  const user = await createTestUser(testUser);
+  await userAgent
+    .post('/api/auth/login')
+    .send({ login: user.username, password: testUser?.password || 'password' });
 
-    return { agent: userAgent, user };
+  return { agent: userAgent, user };
+};
+
+export const initializeDatabase = async (user: User) => {
+  const tasks = [
+    await createTestTask({ cost: 1, type: TaskEnum.Plant }),
+    await createTestTask({ cost: 10, type: TaskEnum.FinanceGenius }),
+  ];
+
+  await createBeds(user);
+  await createUserTestTask(tasks, [user]);
 };

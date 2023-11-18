@@ -1,5 +1,11 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+
 import { UserTask } from './user-task';
+
+export enum TaskEnum {
+  Plant = 'Plant',
+  FinanceGenius = 'FinanceGenius',
+}
 
 @Entity()
 export class Task {
