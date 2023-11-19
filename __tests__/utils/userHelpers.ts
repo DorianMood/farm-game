@@ -21,6 +21,8 @@ export const createTestUser = async (testUser?: TestUserProps) => {
   user.email = testUser?.email || 'testUser@gmail.com';
   user.setPassword(testUser?.password || 'password');
 
+  user.ballance = 2;
+
   await userRepo.save(user);
 
   // Initialize database with tasks, user tasks and beds.

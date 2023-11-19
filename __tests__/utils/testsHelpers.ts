@@ -11,6 +11,7 @@ import type { TestUserProps } from './userHelpers';
 import { createTestUser } from './userHelpers';
 import { createTestTask, createUserTestTask } from './taskHelpers';
 import { createBeds } from './bedsHelpers';
+import { createTestProduct } from './productsHelpers';
 
 interface OverrideExpressOptions {
   logout?: (cb: any) => unknown;
@@ -98,4 +99,12 @@ export const initializeDatabase = async (user: User) => {
 
   await createBeds(user);
   await createUserTestTask(tasks, [user]);
+
+  for (let i = 0; i < 4; i++) {
+    await createTestProduct({
+      name: `Product ${i}`,
+      price: i + 1,
+      content: 'product content',
+    });
+  }
 };
