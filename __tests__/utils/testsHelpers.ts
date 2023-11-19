@@ -12,6 +12,7 @@ import { createTestUser } from './userHelpers';
 import { createTestTask, createUserTestTask } from './taskHelpers';
 import { createBeds } from './bedsHelpers';
 import { createTestProduct } from './productsHelpers';
+import { createTestQuestion, createTestSurvey } from './surveysHelpers';
 
 interface OverrideExpressOptions {
   logout?: (cb: any) => unknown;
@@ -107,4 +108,16 @@ export const initializeDatabase = async (user: User) => {
       content: 'product content',
     });
   }
+
+  const questions = [];
+  for (let i = 0; i < 4; i++) {
+    questions.push(
+      await createTestQuestion({
+        question: `question ${i}`,
+        answer: `answer ${i}`,
+      }),
+    );
+  }
+
+  await createTestSurvey(questions, tasks[1]);
 };

@@ -12,12 +12,22 @@ const retrieve = async (req: Request, res: Response) => {
     throw createHttpError(401, 'User is not authentificated');
   }
 
-  const userTasksQueryBuilder =
-    AppDataSource.getRepository(UserTask).createQueryBuilder('userTask');
+  const user = req.user;
 
-  const userTasks = await userTasksQueryBuilder
-    .where('userTask.user = :userId', { userId: req.user?.id })
-    .getMany();
+  if (!user) {
+    throw createHttpError(401, 'User is not authentificated');
+  }
+
+  const userTasksRepo = AppDataSource.getRepository(UserTask);
+
+  const userTasks = await userTasksRepo.find({
+    where: {
+      user: { id: user.id },
+    },
+    relations: {
+      task: true,
+    },
+  });
 
   return res.json(userTasks);
 };
