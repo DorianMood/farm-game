@@ -1,6 +1,8 @@
 import type { Request, Response } from 'express';
 import createHttpError from 'http-errors';
 
+import { LessThanOrEqual } from 'typeorm';
+
 import { AppDataSource } from '../../../src/data-source';
 import { Product } from '../../../src/entities/product';
 import { validatePurchaseBody } from './validators';
@@ -23,7 +25,7 @@ const purchase = async (req: Request, res: Response) => {
     throw createHttpError(401, 'User is not authentificated');
   }
 
-  validatePurchaseBody(req.body);
+  const { id } = validatePurchaseBody(req.body);
 
   // Create a query runner to control the transactions, it allows to cancel the transaction if we need to
   const queryRunner = AppDataSource.createQueryRunner();
@@ -37,6 +39,27 @@ const purchase = async (req: Request, res: Response) => {
 
     if (!user) {
       throw createHttpError(401, 'User is not authentificated');
+    }
+
+    const productRepo = queryRunner.manager.getRepository(Product);
+
+    const product = await productRepo.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!product) {
+      createHttpError(404, 'Product with given id is not found');
+    }
+
+    const productAvailableForPurchase = await productRepo.findOneBy({
+      id,
+      price: LessThanOrEqual(user.ballance),
+    });
+
+    if (!productAvailableForPurchase) {
+      throw createHttpError(400, 'Insufficient ballance');
     }
 
     // TODO: process purchase here

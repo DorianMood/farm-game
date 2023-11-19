@@ -78,7 +78,7 @@ const complete = async (req: Request, res: Response) => {
     await queryRunner.manager.update(
       UserTask,
       { id, user },
-      { completedAt: new Date().toISOString() }
+      { completedAt: new Date().toISOString() },
     );
 
     await queryRunner.manager.update(User, user, {
@@ -154,13 +154,13 @@ const fail = async (req: Request, res: Response) => {
     await queryRunner.manager.update(
       UserTask,
       { id, user },
-      { completedAt: new Date().toISOString() }
+      { completedAt: new Date().toISOString() },
     );
 
     await queryRunner.manager.update(User, user, {
       ballance: Math.max(
         0,
-        user.ballance - Math.round(taskNotCompleted[0].task.cost / 2)
+        user.ballance - Math.round(taskNotCompleted[0].task.cost / 2),
       ),
     });
 
