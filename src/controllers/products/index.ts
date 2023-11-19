@@ -2,14 +2,20 @@ import type { Request, Response } from 'express';
 import createHttpError from 'http-errors';
 
 import { AppDataSource } from '../../../src/data-source';
+import { Product } from '../../../src/entities/product';
 import { validatePurchaseBody } from './validators';
 
-const retrieve = (req: Request, res: Response) => {
+const retrieve = async (req: Request, res: Response) => {
   if (req.isUnauthenticated()) {
     throw createHttpError(401, 'User is not authentificated');
   }
 
-  return res.sendStatus(501);
+  const productsQueryBuilder =
+    AppDataSource.getRepository(Product).createQueryBuilder('product');
+
+  const products = await productsQueryBuilder.getMany();
+
+  return res.json(products);
 };
 
 const purchase = async (req: Request, res: Response) => {
