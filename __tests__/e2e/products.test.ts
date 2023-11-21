@@ -2,6 +2,7 @@ import type { Server } from 'http';
 import request from 'supertest';
 
 import type { Product } from '../../src/entities/product';
+//import type { User } from '../../src/entities/user';
 import {
   clearDatabase,
   closeDatabase,
@@ -72,7 +73,7 @@ describe('Products routes', () => {
     const products: Product[] = res.body;
 
     const availableProducts = products.filter(
-      (item) => item.price > user.ballance,
+      (item) => item.price > user.ballance
     );
 
     if (availableProducts.length > 0) {
@@ -92,7 +93,7 @@ describe('Products routes', () => {
     const products: Product[] = res.body;
 
     const availableProducts = products.filter(
-      (item) => item.price <= user.ballance,
+      (item) => item.price <= user.ballance
     );
 
     if (availableProducts.length > 0) {
@@ -100,7 +101,62 @@ describe('Products routes', () => {
         .post('/api/products/purchase')
         .send({ id: availableProducts[0].id });
 
-      expect(res.statusCode).toEqual(400);
+      expect(res.statusCode).toEqual(200);
     }
   });
+
+  test.todo(
+    'After purchasing the product, the ballance changes'
+  ); /*, async () => {
+    const { agent, user } = await createAuthenticatedAgent(server);
+
+    const res = await agent.get('/api/products/');
+
+    const products: Product[] = res.body;
+
+    const availableProducts = products.filter(
+      (item) => item.price <= user.ballance
+    );
+
+    if (availableProducts.length > 0) {
+      await agent
+        .post('/api/products/purchase')
+        .send({ id: availableProducts[0].id });
+
+      const res = await agent.get('/api/users');
+      const ballanceAfterPurchase = (res.body as User).ballance;
+
+      expect(res.statusCode).toEqual(200);
+      expect(user.ballance - ballanceAfterPurchase).toBe(
+        availableProducts[0].price
+      );
+    }
+  });*/
+
+  test.todo(
+    'After purchasing the product, it appears in user available products list'
+  ); /*, async () => {
+    const { agent, user } = await createAuthenticatedAgent(server);
+
+    const res = await agent.get('/api/products/');
+
+    const products: Product[] = res.body;
+
+    const availableProducts = products.filter(
+      (item) => item.price <= user.ballance
+    );
+
+    if (availableProducts.length > 0) {
+      await agent
+        .post('/api/products/purchase')
+        .send({ id: availableProducts[0].id });
+
+      const res = await agent.get('/api/users');
+      const productsAfterPurchase = (res.body as User).products;
+
+      expect(res.statusCode).toEqual(200);
+      expect(productsAfterPurchase).toHaveLength(products.length + 1);
+      expect(productsAfterPurchase).toContain(availableProducts[0]);
+    }
+  });*/
 });

@@ -12,7 +12,7 @@ export class Task {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @OneToMany((type) => UserTask, (userTask) => userTask.task, { cascade: true })
+  @OneToMany(() => UserTask, (userTask) => userTask.task)
   userTask!: UserTask[];
 
   @Column({ nullable: false, unique: false })

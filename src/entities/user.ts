@@ -3,6 +3,8 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -11,6 +13,7 @@ import bcrypt from 'bcryptjs';
 
 import { Bed } from './bed';
 import { UserTask } from './user-task';
+import { Product } from './product';
 
 @Entity()
 export class User {
@@ -32,20 +35,24 @@ export class User {
   @Column({ nullable: false, unique: true, length: 255 })
   email!: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, select: false })
   hashPassword!: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, select: false })
   salt!: string;
 
-  @OneToMany((type) => Bed, (bed) => bed.user, { cascade: true })
+  @OneToMany(() => Bed, (bed) => bed.user)
   beds!: Bed[];
 
   @Column({ nullable: false, default: 0 })
   ballance!: number;
 
-  @OneToMany((type) => UserTask, (task) => task.user, { cascade: true })
+  @OneToMany(() => UserTask, (task) => task.user)
   tasks!: UserTask[];
+
+  @ManyToMany(() => Product)
+  @JoinTable()
+  products!: Product[];
 
   setPassword(password: string) {
     this.salt = bcrypt.genSaltSync(12);

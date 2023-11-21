@@ -4,7 +4,7 @@ import request from 'supertest';
 import { AppDataSource } from '../../src/data-source';
 import { User } from '../../src/entities/user';
 import type { Bed } from '../../src/entities/bed';
-import { Task } from '../../src/entities/task';
+import type { Task } from '../../src/entities/task';
 import {
   clearDatabase,
   closeDatabase,
@@ -81,7 +81,7 @@ describe('Users routes', () => {
 
     expect(res4.statusCode).toEqual(400);
     expect(res4.body.message).toEqual(
-      'Username must contain at least 5 characters'
+      'Username must contain at least 5 characters',
     );
 
     // Email is invalid
@@ -99,7 +99,7 @@ describe('Users routes', () => {
 
     expect(res6.statusCode).toEqual(400);
     expect(res6.body.message).toEqual(
-      'Password must contain at least 8 characters'
+      'Password must contain at least 8 characters',
     );
   });
 
@@ -154,9 +154,15 @@ describe('Users routes', () => {
     const res = await agent.get('/api/tasks/');
     const tasks: Task[] = res.body;
 
-    console.log(tasks);
+    expect(res.statusCode).toEqual(200);
+    expect(tasks).toHaveLength(2);
+  });
+
+  test('Get current authentificated user', async () => {
+    const { agent } = await createAuthenticatedAgent(server);
+
+    const res = await agent.get('/api/users');
 
     expect(res.statusCode).toEqual(200);
-    expect(tasks).toHaveLength(1);
   });
 });

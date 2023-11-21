@@ -1,4 +1,4 @@
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import createHttpError from 'http-errors';
 
 import { AppDataSource } from '../../data-source';
@@ -7,9 +7,34 @@ import { Bed } from '../../entities/bed';
 import type { UsersCreateBody } from '../../types/routes/users';
 import { validateCreateBody } from './validators';
 
+const retrieve = async (req: Request, res: Response) => {
+  if (req.isUnauthenticated()) {
+    throw createHttpError(401, 'User is not authentificated');
+  }
+
+  const user = req.user;
+
+  if (!user) {
+    throw createHttpError(401, 'User is not authentificated');
+  }
+
+  const queryRunner = AppDataSource.createQueryRunner();
+
+  const userWithProducts = await queryRunner.manager.findOne(User, {
+    where: { id: user.id },
+    relations: {
+      beds: true,
+      products: true,
+      tasks: true,
+    },
+  });
+
+  return res.json(userWithProducts);
+};
+
 const create = async (
   req: TypedRequestBody<UsersCreateBody>,
-  res: Response
+  res: Response,
 ) => {
   const { username, email, password } = validateCreateBody(req.body);
 
@@ -25,6 +50,7 @@ const create = async (
     const usernameExists = await userRepo.exist({
       where: { username },
     });
+
     if (usernameExists) {
       throw createHttpError(409, 'Username already exists');
     }
@@ -40,6 +66,11 @@ const create = async (
     newUser.username = username;
     newUser.email = email;
     newUser.setPassword(password);
+
+    newUser.products = [];
+    newUser.tasks = [];
+
+    newUser.ballance = 0;
 
     // Create 10 beds for each user
     const newBeds: Bed[] = [];
@@ -70,5 +101,6 @@ const create = async (
 };
 
 export default {
-    create,
+  create,
+  retrieve,
 };

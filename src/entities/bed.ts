@@ -18,7 +18,7 @@ export class Bed {
   @Column({ nullable: false })
   index!: number;
 
-  @ManyToOne((type) => User, (user) => user.beds, {
+  @ManyToOne(() => User, (user) => user.beds, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })

@@ -62,11 +62,19 @@ const purchase = async (req: Request, res: Response) => {
       throw createHttpError(400, 'Insufficient ballance');
     }
 
-    // TODO: process purchase here
+    user.ballance -= productAvailableForPurchase.price;
+
+    if (Array.isArray(user.products)) {
+      user.products.push(productAvailableForPurchase);
+    } else {
+      user.products = [productAvailableForPurchase];
+    }
+
+    await queryRunner.manager.save(user);
 
     await queryRunner.commitTransaction();
 
-    return res.sendStatus(501);
+    return res.sendStatus(200);
   } catch (err) {
     // As an exception occured, cancel the transaction
     await queryRunner.rollbackTransaction();
