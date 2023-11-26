@@ -1,21 +1,23 @@
-import type { Request, Response } from 'express';
-import createHttpError from 'http-errors';
+import type { Request, Response } from "express";
+import createHttpError from "http-errors";
 
-import { AppDataSource } from '../../data-source';
-import { User } from '../../entities/user';
-import { Bed } from '../../entities/bed';
-import type { UsersCreateBody } from '../../types/routes/users';
-import { validateCreateBody } from './validators';
+import { AppDataSource } from "../../data-source";
+import { User } from "../../entities/user";
+import { Bed } from "../../entities/bed";
+import { Task } from "../../entities/task";
+import { UserTask } from "../../entities/user-task";
+import type { UsersCreateBody } from "../../types/routes/users";
+import { validateCreateBody } from "./validators";
 
 const retrieve = async (req: Request, res: Response) => {
   if (req.isUnauthenticated()) {
-    throw createHttpError(401, 'User is not authentificated');
+    throw createHttpError(401, "User is not authentificated");
   }
 
   const user = req.user;
 
   if (!user) {
-    throw createHttpError(401, 'User is not authentificated');
+    throw createHttpError(401, "User is not authentificated");
   }
 
   const queryRunner = AppDataSource.createQueryRunner();
@@ -52,14 +54,14 @@ const create = async (
     });
 
     if (usernameExists) {
-      throw createHttpError(409, 'Username already exists');
+      throw createHttpError(409, "Username already exists");
     }
 
     const emailExists = await userRepo.exist({
       where: { email },
     });
     if (emailExists) {
-      throw createHttpError(409, 'Email already exists');
+      throw createHttpError(409, "Email already exists");
     }
 
     const newUser = new User();
@@ -68,7 +70,21 @@ const create = async (
     newUser.setPassword(password);
 
     newUser.products = [];
-    newUser.tasks = [];
+
+    // Assign all available tasks to each user
+    const taskRepo = queryRunner.manager.getRepository(Task);
+    const tasks = await taskRepo.find();
+
+    const userTaskRepo = queryRunner.manager.getRepository(UserTask);
+    const userTasks: UserTask[] = [];
+    for (const task of tasks) {
+      const userTask = new UserTask();
+      userTask.task = task;
+      userTask.completedAt = null;
+      await userTaskRepo.manager.save(userTask);
+      userTasks.push(userTask);
+    }
+    newUser.tasks = userTasks;
 
     newUser.ballance = 0;
 

@@ -23,9 +23,9 @@
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": false,
-    "typeRoots": ["@types", "./node_modules/@types"],  
+    "typeRoots": ["@types", "./node_modules/@types"]
   },
   "include": ["src/**/*", "__tests__/**/*"],
   "exclude": ["node_modules", "build"],
-  "files": ["@types/express/index.d.ts"]
+  "files": ["@types/express/index.d.ts", "./src/migrations/Sh1701014473465.ts"]
 }

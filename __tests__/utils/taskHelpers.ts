@@ -1,7 +1,8 @@
-import { AppDataSource } from '../../src/data-source';
-import { User } from '../../src/entities/user';
-import { Task, TaskEnum } from '../../src/entities/task';
-import { UserTask } from '../../src/entities/user-task';
+import { AppDataSource } from "../../src/data-source";
+import type { User } from "../../src/entities/user";
+import type { TaskEnum } from "../../src/entities/task";
+import { Task } from "../../src/entities/task";
+import { UserTask } from "../../src/entities/user-task";
 
 interface TestTaskProps {
   cost: number;
@@ -33,8 +34,8 @@ export const createTestTask = async (testTask: TestTaskProps) => {
 export const createUserTestTask = async (tasks: Task[], users: User[]) => {
   const userTaskRepo = AppDataSource.getRepository(UserTask);
 
-  for (let task of tasks) {
-    for (let user of users) {
+  for (const task of tasks) {
+    for (const user of users) {
       const userTask = new UserTask();
       userTask.task = task;
       userTask.user = user;
