@@ -22,6 +22,8 @@ const retrieve = async (req: Request, res: Response) => {
 
   const queryRunner = AppDataSource.createQueryRunner();
 
+  console.log("before");
+
   const userWithProducts = await queryRunner.manager.findOne(User, {
     where: { id: user.id },
     relations: {
@@ -30,6 +32,8 @@ const retrieve = async (req: Request, res: Response) => {
       tasks: true,
     },
   });
+
+  console.log("after");
 
   return res.json(userWithProducts);
 };
