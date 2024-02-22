@@ -1,23 +1,23 @@
-import createHttpError from 'http-errors';
-import type { Request, Response } from 'express';
-import { IsNull, LessThan } from 'typeorm';
+import createHttpError from "http-errors";
+import type { Request, Response } from "express";
+import { IsNull, LessThan } from "typeorm";
 
-import { AppDataSource } from '../../data-source';
-import { Bed, CropEnum } from '../../entities/bed';
-import { User } from '../../entities/user';
-import { BED_GROWING_TIMEOUT } from '../../common/constants';
-import { validateHarvestBody, validatePlantBody } from './validators';
+import { AppDataSource } from "../../data-source";
+import { Bed, CropEnum } from "../../entities/bed";
+import { User } from "../../entities/user";
+import { BED_GROWING_TIMEOUT } from "../../common/constants";
+import { validateHarvestBody, validatePlantBody } from "./validators";
 
 const retrieve = async (req: Request, res: Response) => {
   if (req.isUnauthenticated()) {
-    throw createHttpError(401, 'User is not authentificated');
+    throw createHttpError(401, "User is not authentificated");
   }
 
   const bedsQueryBuilder =
-    AppDataSource.getRepository(Bed).createQueryBuilder('bed');
+    AppDataSource.getRepository(Bed).createQueryBuilder("bed");
 
   const beds = await bedsQueryBuilder
-    .where('bed.user = :userId', { userId: req.user?.id })
+    .where("bed.user = :userId", { userId: req.user?.id })
     .getMany();
 
   return res.json(beds);
@@ -25,7 +25,7 @@ const retrieve = async (req: Request, res: Response) => {
 
 const harvest = async (req: Request, res: Response) => {
   if (req.isUnauthenticated()) {
-    throw createHttpError(401, 'User is not authentificated');
+    throw createHttpError(401, "User is not authentificated");
   }
 
   const { index } = validateHarvestBody(req.body);
@@ -41,7 +41,7 @@ const harvest = async (req: Request, res: Response) => {
     const user = req.user;
 
     if (!user) {
-      throw createHttpError(401, 'User is not authentificated');
+      throw createHttpError(401, "User is not authentificated");
     }
 
     const bedRepo = queryRunner.manager.getRepository(Bed);
@@ -51,7 +51,7 @@ const harvest = async (req: Request, res: Response) => {
     });
 
     if (!bedExists) {
-      throw createHttpError(404, 'Bed with given index not found');
+      throw createHttpError(404, "Bed with given index not found");
     }
 
     const bedReady = await bedRepo.exist({
@@ -65,7 +65,7 @@ const harvest = async (req: Request, res: Response) => {
     });
 
     if (!bedReady) {
-      throw createHttpError(409, 'Bed is not ready');
+      throw createHttpError(409, "Bed is not ready");
     }
 
     await queryRunner.manager.update(
@@ -95,7 +95,7 @@ const harvest = async (req: Request, res: Response) => {
 
 const plant = async (req: Request, res: Response) => {
   if (req.isUnauthenticated()) {
-    throw createHttpError(401, 'User is not authentificated');
+    throw createHttpError(401, "User is not authentificated");
   }
 
   const { index, crop } = validatePlantBody(req.body);
@@ -111,7 +111,7 @@ const plant = async (req: Request, res: Response) => {
     const user = req.user;
 
     if (!user) {
-      throw createHttpError(401, 'User is not authentificated');
+      throw createHttpError(401, "User is not authentificated");
     }
 
     const bedRepo = queryRunner.manager.getRepository(Bed);
@@ -121,7 +121,7 @@ const plant = async (req: Request, res: Response) => {
     });
 
     if (!bedExists) {
-      throw createHttpError(404, 'Bed with given index not found');
+      throw createHttpError(404, "Bed with given index not found");
     }
 
     const bedReady = await bedRepo.exist({
@@ -133,7 +133,7 @@ const plant = async (req: Request, res: Response) => {
     });
 
     if (!bedReady) {
-      throw createHttpError(409, 'Bed is not empty');
+      throw createHttpError(409, "Bed is not empty");
     }
 
     await queryRunner.manager.update(
@@ -141,6 +141,10 @@ const plant = async (req: Request, res: Response) => {
       { index, user },
       { plantedAt: new Date().toISOString(), crop: CropEnum[crop] },
     );
+
+    user.ballance += 10;
+
+    await queryRunner.manager.save(user);
 
     await queryRunner.commitTransaction();
 
