@@ -1,21 +1,21 @@
-import type { Request, Response } from 'express';
-import createHttpError from 'http-errors';
-import { LessThan, IsNull } from 'typeorm';
+import type { Request, Response } from "express";
+import createHttpError from "http-errors";
+import { LessThan, IsNull } from "typeorm";
 
-import { User } from '../../../src/entities/user';
-import { UserTask } from '../../../src/entities/user-task';
-import { AppDataSource } from '../../../src/data-source';
-import { validateCompleteBody, validateFailBody } from './validators';
+import { User } from "../../entities/user";
+import { UserTask } from "../../entities/user-task";
+import { AppDataSource } from "../../data-source";
+import { validateCompleteBody, validateFailBody } from "./validators";
 
 const retrieve = async (req: Request, res: Response) => {
   if (req.isUnauthenticated()) {
-    throw createHttpError(401, 'User is not authentificated');
+    throw createHttpError(401, "User is not authentificated");
   }
 
   const user = req.user;
 
   if (!user) {
-    throw createHttpError(401, 'User is not authentificated');
+    throw createHttpError(401, "User is not authentificated");
   }
 
   const userTasksRepo = AppDataSource.getRepository(UserTask);
@@ -34,7 +34,7 @@ const retrieve = async (req: Request, res: Response) => {
 
 const complete = async (req: Request, res: Response) => {
   if (req.isUnauthenticated()) {
-    throw createHttpError(401, 'User is not authentificated');
+    throw createHttpError(401, "User is not authentificated");
   }
 
   const { id } = validateCompleteBody(req.body);
@@ -50,7 +50,7 @@ const complete = async (req: Request, res: Response) => {
     const user = req.user;
 
     if (!user) {
-      throw createHttpError(401, 'User is not authentificated');
+      throw createHttpError(401, "User is not authentificated");
     }
 
     const userTaskRepo = queryRunner.manager.getRepository(UserTask);
@@ -60,7 +60,7 @@ const complete = async (req: Request, res: Response) => {
     });
 
     if (!userTaskExists) {
-      throw createHttpError(404, 'User task with given id not found');
+      throw createHttpError(404, "User task with given id not found");
     }
 
     const taskNotCompleted = await userTaskRepo.find({
@@ -82,7 +82,7 @@ const complete = async (req: Request, res: Response) => {
     });
 
     if (!taskNotCompleted.length) {
-      throw createHttpError(409, 'Task is already completed');
+      throw createHttpError(409, "Task is already completed");
     }
 
     await queryRunner.manager.update(
@@ -110,7 +110,7 @@ const complete = async (req: Request, res: Response) => {
 
 const fail = async (req: Request, res: Response) => {
   if (req.isUnauthenticated()) {
-    throw createHttpError(401, 'User is not authentificated');
+    throw createHttpError(401, "User is not authentificated");
   }
 
   const { id } = validateFailBody(req.body);
@@ -126,7 +126,7 @@ const fail = async (req: Request, res: Response) => {
     const user = req.user;
 
     if (!user) {
-      throw createHttpError(401, 'User is not authentificated');
+      throw createHttpError(401, "User is not authentificated");
     }
 
     const userTaskRepo = queryRunner.manager.getRepository(UserTask);
@@ -136,7 +136,7 @@ const fail = async (req: Request, res: Response) => {
     });
 
     if (!userTaskExists) {
-      throw createHttpError(404, 'User task with given id not found');
+      throw createHttpError(404, "User task with given id not found");
     }
 
     const taskNotCompleted = await userTaskRepo.find({
@@ -158,7 +158,7 @@ const fail = async (req: Request, res: Response) => {
     });
 
     if (!taskNotCompleted.length) {
-      throw createHttpError(409, 'Task is already completed or failed');
+      throw createHttpError(409, "Task is already completed or failed");
     }
 
     await queryRunner.manager.update(

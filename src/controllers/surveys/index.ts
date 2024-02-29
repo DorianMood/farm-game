@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
 import createHttpError from "http-errors";
 
-import { Survey } from "../../../src/entities/survey";
-import { AppDataSource } from "../../../src/data-source";
+import { Survey } from "../../entities/survey";
+import { AppDataSource } from "../../data-source";
 import { validateSurveysQuery } from "./validators";
 
 const retrieve = async (req: Request, res: Response) => {

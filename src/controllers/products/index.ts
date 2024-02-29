@@ -1,19 +1,19 @@
-import type { Request, Response } from 'express';
-import createHttpError from 'http-errors';
+import type { Request, Response } from "express";
+import createHttpError from "http-errors";
 
-import { LessThanOrEqual } from 'typeorm';
+import { LessThanOrEqual } from "typeorm";
 
-import { AppDataSource } from '../../../src/data-source';
-import { Product } from '../../../src/entities/product';
-import { validatePurchaseBody } from './validators';
+import { AppDataSource } from "../../data-source";
+import { Product } from "../../entities/product";
+import { validatePurchaseBody } from "./validators";
 
 const retrieve = async (req: Request, res: Response) => {
   if (req.isUnauthenticated()) {
-    throw createHttpError(401, 'User is not authentificated');
+    throw createHttpError(401, "User is not authentificated");
   }
 
   const productsQueryBuilder =
-    AppDataSource.getRepository(Product).createQueryBuilder('product');
+    AppDataSource.getRepository(Product).createQueryBuilder("product");
 
   const products = await productsQueryBuilder.getMany();
 
@@ -22,7 +22,7 @@ const retrieve = async (req: Request, res: Response) => {
 
 const purchase = async (req: Request, res: Response) => {
   if (req.isUnauthenticated()) {
-    throw createHttpError(401, 'User is not authentificated');
+    throw createHttpError(401, "User is not authentificated");
   }
 
   const { id } = validatePurchaseBody(req.body);
@@ -38,7 +38,7 @@ const purchase = async (req: Request, res: Response) => {
     const user = req.user;
 
     if (!user) {
-      throw createHttpError(401, 'User is not authentificated');
+      throw createHttpError(401, "User is not authentificated");
     }
 
     const productRepo = queryRunner.manager.getRepository(Product);
@@ -50,7 +50,7 @@ const purchase = async (req: Request, res: Response) => {
     });
 
     if (!product) {
-      createHttpError(404, 'Product with given id is not found');
+      createHttpError(404, "Product with given id is not found");
     }
 
     const productAvailableForPurchase = await productRepo.findOneBy({
@@ -59,7 +59,7 @@ const purchase = async (req: Request, res: Response) => {
     });
 
     if (!productAvailableForPurchase) {
-      throw createHttpError(400, 'Insufficient ballance');
+      throw createHttpError(400, "Insufficient ballance");
     }
 
     user.ballance -= productAvailableForPurchase.price;
