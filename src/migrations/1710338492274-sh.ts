@@ -1,14 +1,15 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
-import {Product} from "../entities/product";
-import {Question} from "../entities/question";
-import {Survey} from "../entities/survey";
-import {Task, TaskEnum} from "../entities/task";
+import { MigrationInterface, QueryRunner } from "typeorm";
+import { Product } from "../entities/product";
+import { Question } from "../entities/question";
+import { Survey } from "../entities/survey";
+import { Task, TaskEnum } from "../entities/task";
 
-export class Sh1701014473465 implements MigrationInterface {
+export class Sh1710338492274 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
+    // Tasks
     const taskRepo = queryRunner.manager.getRepository(Task);
 
     const plantTask = new Task();
@@ -21,6 +22,7 @@ export class Sh1701014473465 implements MigrationInterface {
 
     taskRepo.save([plantTask, surveyTask]);
 
+    // Products
     const productRepo = queryRunner.connection.getRepository(Product);
 
     const products = [];
@@ -34,6 +36,7 @@ export class Sh1701014473465 implements MigrationInterface {
     }
     productRepo.save(products);
 
+    // Questions
     const questionRepo = queryRunner.connection.getRepository(Question);
     const questions = [];
     for (let i = 0; i < 5; i++) {
@@ -44,6 +47,7 @@ export class Sh1701014473465 implements MigrationInterface {
     }
     questionRepo.save(questions);
 
+    // Survey
     const surveyRepo = queryRunner.manager.getRepository(Survey);
     await surveyRepo.insert([
       {
