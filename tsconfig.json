@@ -27,5 +27,6 @@
   },
   "include": ["src/**/*", "__tests__/**/*"],
   "exclude": ["node_modules", "build"],
-  "files": ["@types/express/index.d.ts", "./src/migrations/Sh1701014473465.ts"]
+  "files": ["@types/express/index.d.ts"]
 }
+

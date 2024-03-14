@@ -26,28 +26,40 @@
     "require-await": "off",
     "arrow-body-style": ["error", "as-needed"],
     "eqeqeq": "error",
-    "quotes": ["warn", "single"],
+    "quotes": ["warn", "double"],
 
     "@typescript-eslint/await-thenable": "error",
     "@typescript-eslint/require-await": "error",
     "@typescript-eslint/no-unnecessary-condition": "warn",
-    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "req|res|next|err" }],
-    "@typescript-eslint/consistent-type-imports": ["error", { "prefer": "type-imports" }],
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      { "argsIgnorePattern": "req|res|next|err" }
+    ],
+    "@typescript-eslint/consistent-type-imports": [
+      "error",
+      { "prefer": "type-imports" }
+    ],
     "@typescript-eslint/no-floating-promises": "error",
     "@typescript-eslint/semi": ["warn"],
-    "@typescript-eslint/member-delimiter-style": ["error", {
-      "multiline": {
+    "@typescript-eslint/member-delimiter-style": [
+      "error",
+      {
+        "multiline": {
           "delimiter": "semi",
           "requireLast": true
-      },
-      "singleline": {
+        },
+        "singleline": {
           "delimiter": "semi",
           "requireLast": false
+        }
       }
-    }],
+    ],
 
     "eslint-comments/no-unused-disable": "error",
-    "eslint-comments/disable-enable-pair": ["error", { "allowWholeFile": true }],
+    "eslint-comments/disable-enable-pair": [
+      "error",
+      { "allowWholeFile": true }
+    ],
 
     "import/default": "off",
     "import/no-duplicates": ["error"],
@@ -64,3 +76,4 @@
     ]
   }
 }
+
