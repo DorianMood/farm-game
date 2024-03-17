@@ -64,6 +64,8 @@
     "docker:down": "docker compose down",
     "docker:shell": "docker exec -it api sh",
     "docker:build": "docker build -t farm-game/backend .",
+    "docker:migrate": "docker compose up -d && docker exec -t api yarn migration:run",
+    "docker:start": "docker compose up -d && docker exec -t api yarn build && docker exec -t api yarn start",
     "migration:generate": "sh -c 'ts-node ./node_modules/typeorm/cli.js migration:generate -d src/data-source.ts src/migrations/$0'",
     "migration:create": "sh -c 'ts-node ./node_modules/typeorm/cli.js migration:create src/migrations/$0'",
     "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert -d src/data-source.ts",
