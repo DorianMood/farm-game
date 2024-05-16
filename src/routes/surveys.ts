@@ -1,9 +1,9 @@
-import express from 'express';
+import express from "express";
 
-import SurveysController from '../controllers/surveys';
+import SurveysController from "../controllers/surveys";
 
 const router = express.Router();
 
-router.get('/', SurveysController.retrieve);
+router.get("/", SurveysController.retrieve);
 
 export default router;

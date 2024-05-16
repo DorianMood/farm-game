@@ -20,7 +20,11 @@ export class Sh1710338492274 implements MigrationInterface {
     surveyTask.type = TaskEnum.FinanceGenius;
     surveyTask.cost = 10;
 
-    taskRepo.save([plantTask, surveyTask]);
+    const gameTask = new Task();
+    gameTask.type = TaskEnum.CustomGame;
+    gameTask.cost = 100;
+
+    taskRepo.save([plantTask, surveyTask, gameTask]);
 
     // Products
     const productRepo = queryRunner.connection.getRepository(Product);

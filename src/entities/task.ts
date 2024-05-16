@@ -1,15 +1,16 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
-import { UserTask } from './user-task';
+import { UserTask } from "./user-task";
 
 export enum TaskEnum {
-  Plant = 'Plant',
-  FinanceGenius = 'FinanceGenius',
+  Plant = "Plant",
+  FinanceGenius = "FinanceGenius",
+  CustomGame = "CustomGame",
 }
 
 @Entity()
 export class Task {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
   @OneToMany(() => UserTask, (userTask) => userTask.task)
