@@ -13,4 +13,4 @@ COPY package* ./
 COPY yarn.lock ./
 RUN yarn install --production
 EXPOSE 8080
-CMD ["yarn", "dev"]
+CMD ["yarn", "start"]

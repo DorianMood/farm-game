@@ -1,4 +1,18 @@
 services:
+  api_dev:
+    container_name: api
+    image: node:18-alpine
+    ports:
+      - ${PORT}:${PORT}
+    depends_on:
+      - db
+    working_dir: /app
+    volumes:
+      - ./:/app
+    stdin_open: true
+    tty: true
+    profiles: ["dev"]
+
   api:
     container_name: api
     image: node:18-alpine
@@ -9,14 +23,16 @@ services:
     working_dir: /app
     volumes:
       - ./:/app
-    stdin_open: true 
+    stdin_open: true
     tty: true
+    profiles: ["production"]
+    command: sh -c "yarn build && yarn start"
 
   db:
     container_name: postgres
     image: postgres:15-alpine
     ports:
-      - '${DB_HOST_PORT}:${DB_PORT}'
+      - "${DB_HOST_PORT}:${DB_PORT}"
     volumes:
       - data:/var/lib/postgresql/data
     environment:
@@ -27,7 +43,7 @@ services:
     container_name: test_postgres
     image: postgres:15-alpine
     ports:
-      - '${TEST_DB_HOST_PORT}:${DB_PORT}'
+      - "${TEST_DB_HOST_PORT}:${DB_PORT}"
     environment:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${TEST_DB_NAME}
