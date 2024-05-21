@@ -20,10 +20,11 @@ export default session({
   secret: "farm-game-rshb",
   saveUninitialized: false,
   resave: false,
+  proxy: process.env.NODE_ENV === "production",
   cookie: {
-    secure: process.env.NODE_ENV === "production" ? true : false,
-    httpOnly: process.env.NODE_ENV === "production" ? true : false,
-    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: process.env.NODE_ENV === "production",
+    sameSite: "none",
     maxAge: 90 * 24 * 60 * 60 * 1000, // 3 months
   },
 });
