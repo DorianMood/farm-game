@@ -18,6 +18,9 @@ const createServer = () => {
     optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
   };
 
+  // INFO: we need this to use http only Set-Cookie over http (since https is provided by nginx)
+  app.set("trust proxy", 1);
+
   app.use(morgan("dev"));
   app.use(cors(corsOptions));
   app.use(urlencoded({ extended: true }));
@@ -41,4 +44,3 @@ const createServer = () => {
 };
 
 export default createServer;
-
