@@ -11,7 +11,7 @@ services:
       - ./:/app
     stdin_open: true
     tty: true
-    profiles: ["dev"]
+    profiles: [dev]
 
   api:
     container_name: api
@@ -25,7 +25,7 @@ services:
       - ./:/app
     stdin_open: true
     tty: true
-    profiles: ["production"]
+    profiles: [production]
     command: sh -c "yarn build && yarn start"
 
   db:
