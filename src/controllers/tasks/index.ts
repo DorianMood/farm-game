@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import createHttpError from "http-errors";
 import { LessThan, IsNull } from "typeorm";
 
-import { User } from "../../entities/user";
+import { TASK_TIMEOUT } from "../../common/constants";
 import { UserTask } from "../../entities/user-task";
 import { AppDataSource } from "../../data-source";
 import { validateCompleteBody, validateFailBody } from "./validators";
@@ -68,7 +68,9 @@ const complete = async (req: Request, res: Response) => {
         {
           id,
           user: { id: user.id },
-          completedAt: LessThan(new Date(Date.now() - 123).toISOString()),
+          completedAt: LessThan(
+            new Date(Date.now() - TASK_TIMEOUT).toISOString(),
+          ),
         },
         {
           id,
@@ -91,16 +93,20 @@ const complete = async (req: Request, res: Response) => {
       { completedAt: new Date().toISOString() },
     );
 
-    await queryRunner.manager.update(User, user, {
-      ballance: user.ballance + taskNotCompleted[0].task.cost,
-    });
+    user.ballance += taskNotCompleted[0].task.cost;
+
+    await queryRunner.manager.save(user);
 
     await queryRunner.commitTransaction();
+    // We need to release the query runner to not keep a useless connection to the database
+    await queryRunner.release();
 
     return res.sendStatus(200);
   } catch (err) {
     // As an exception occured, cancel the transaction
     await queryRunner.rollbackTransaction();
+    // We need to release the query runner to not keep a useless connection to the database
+    await queryRunner.release();
     throw err;
   } finally {
     // We need to release the query runner to not keep a useless connection to the database
@@ -144,7 +150,9 @@ const fail = async (req: Request, res: Response) => {
         {
           id,
           user: { id: user.id },
-          completedAt: LessThan(new Date(Date.now() - 123).toISOString()),
+          completedAt: LessThan(
+            new Date(Date.now() - TASK_TIMEOUT).toISOString(),
+          ),
         },
         {
           id,
@@ -167,19 +175,23 @@ const fail = async (req: Request, res: Response) => {
       { completedAt: new Date().toISOString() },
     );
 
-    await queryRunner.manager.update(User, user, {
-      ballance: Math.max(
-        0,
-        user.ballance - Math.round(taskNotCompleted[0].task.cost / 2),
-      ),
-    });
+    user.ballance = Math.max(
+      0,
+      user.ballance - Math.round(taskNotCompleted[0].task.cost / 2),
+    );
+
+    await queryRunner.manager.save(user);
 
     await queryRunner.commitTransaction();
+    // We need to release the query runner to not keep a useless connection to the database
+    await queryRunner.release();
 
     return res.sendStatus(200);
   } catch (err) {
     // As an exception occured, cancel the transaction
     await queryRunner.rollbackTransaction();
+    // We need to release the query runner to not keep a useless connection to the database
+    await queryRunner.release();
     throw err;
   } finally {
     // We need to release the query runner to not keep a useless connection to the database

@@ -1,6 +1,6 @@
-import type { Request, Response, NextFunction } from 'express';
-import type { HttpError as IHttpError } from 'http-errors';
-import createHttpError, { isHttpError } from 'http-errors';
+import type { Request, Response, NextFunction } from "express";
+import type { HttpError as IHttpError } from "http-errors";
+import createHttpError, { isHttpError } from "http-errors";
 
 export const errorHandler = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -17,7 +17,7 @@ export const errorHandler = (
     // so we throw an internal server error
     // TODO: add console error here
     // console.error('Internal server error:', err.message);
-    error = createHttpError(500, err.message ?? 'Unexpected error');
+    error = createHttpError(500, err.message ?? "Unexpected error");
   }
 
   const formatedError = {

@@ -16,23 +16,17 @@ passport.use(
         const userRepo = AppDataSource.getRepository(User);
 
         // Search a user whose username or email is the login parameter
-        const user = await userRepo
-          .createQueryBuilder("user")
-          .addSelect(["user.salt", "user.hashPassword"])
-          .where([{ username: login }, { email: login }])
-          .getOne();
-
-        const userWithoutPassword = await userRepo.findOne({
+        const user = await userRepo.findOne({
           where: [{ username: login }, { email: login }],
         });
 
         // If the user doesn't exist or the password is wrong, return error as null and user as null
         // It allows to distinguish technical error and wrong credentials
-        if (!user || !user.verifyPassword(password) || !userWithoutPassword) {
+        if (!user || !user.verifyPassword(password)) {
           return done(null, undefined);
         }
 
-        return done(null, userWithoutPassword);
+        return done(null, user);
       } catch (err) {
         return done(err);
       }
@@ -41,9 +35,7 @@ passport.use(
 );
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-passport.serializeUser((user: any, done: any) => {
-  done(null, user.id);
-});
+passport.serializeUser((user: any, done: any) => done(null, user.id));
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 passport.deserializeUser(async (req: Request, id: string, done: any) => {
@@ -61,4 +53,3 @@ passport.deserializeUser(async (req: Request, id: string, done: any) => {
 });
 
 export default passport;
-

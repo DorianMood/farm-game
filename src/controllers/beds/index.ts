@@ -4,8 +4,11 @@ import { IsNull, LessThan } from "typeorm";
 
 import { AppDataSource } from "../../data-source";
 import { Bed, CropEnum } from "../../entities/bed";
-import { User } from "../../entities/user";
-import { BED_GROWING_TIMEOUT } from "../../common/constants";
+import {
+  BED_GROWING_TIMEOUT,
+  BED_PLANT_REWARD,
+  BED_HARVEST_REWARD,
+} from "../../common/constants";
 import { validateHarvestBody, validatePlantBody } from "./validators";
 
 const retrieve = async (req: Request, res: Response) => {
@@ -74,18 +77,20 @@ const harvest = async (req: Request, res: Response) => {
       { plantedAt: null, crop: null },
     );
 
-    await queryRunner.manager.update(
-      User,
-      { id: req.user?.id },
-      { ballance: user.ballance + 100 },
-    );
+    user.ballance += BED_HARVEST_REWARD;
+
+    await queryRunner.manager.save(user);
 
     await queryRunner.commitTransaction();
+    // We need to release the query runner to not keep a useless connection to the database
+    await queryRunner.release();
 
     return res.status(200).send();
   } catch (err) {
     // As an exception occured, cancel the transaction
     await queryRunner.rollbackTransaction();
+    // We need to release the query runner to not keep a useless connection to the database
+    await queryRunner.release();
     throw err;
   } finally {
     // We need to release the query runner to not keep a useless connection to the database
@@ -142,16 +147,21 @@ const plant = async (req: Request, res: Response) => {
       { plantedAt: new Date().toISOString(), crop: CropEnum[crop] },
     );
 
-    user.ballance += 10;
+    user.ballance += BED_PLANT_REWARD;
 
     await queryRunner.manager.save(user);
 
     await queryRunner.commitTransaction();
 
+    // We need to release the query runner to not keep a useless connection to the database
+    await queryRunner.release();
+
     return res.status(200).send();
   } catch (err) {
     // As an exception occured, cancel the transaction
     await queryRunner.rollbackTransaction();
+    // We need to release the query runner to not keep a useless connection to the database
+    await queryRunner.release();
     throw err;
   } finally {
     // We need to release the query runner to not keep a useless connection to the database

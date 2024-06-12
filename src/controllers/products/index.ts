@@ -73,11 +73,15 @@ const purchase = async (req: Request, res: Response) => {
     await queryRunner.manager.save(user);
 
     await queryRunner.commitTransaction();
+    // We need to release the query runner to not keep a useless connection to the database
+    await queryRunner.release();
 
     return res.sendStatus(200);
   } catch (err) {
     // As an exception occured, cancel the transaction
     await queryRunner.rollbackTransaction();
+    // We need to release the query runner to not keep a useless connection to the database
+    await queryRunner.release();
     throw err;
   } finally {
     // We need to release the query runner to not keep a useless connection to the database

@@ -31,6 +31,8 @@ const retrieve = async (req: Request, res: Response) => {
     },
   });
 
+  await queryRunner.release();
+
   return res.json(userWithProducts);
 };
 
@@ -104,11 +106,15 @@ const create = async (
 
     // No exceptions occured, so we commit the transaction
     await queryRunner.commitTransaction();
+    // We need to release the query runner to not keep a useless connection to the database
+    await queryRunner.release();
 
-    res.send(newUser.id);
+    return res.send(newUser.id);
   } catch (err) {
     // As an exception occured, cancel the transaction
     await queryRunner.rollbackTransaction();
+    // We need to release the query runner to not keep a useless connection to the database
+    await queryRunner.release();
     throw err;
   } finally {
     // We need to release the query runner to not keep a useless connection to the database
