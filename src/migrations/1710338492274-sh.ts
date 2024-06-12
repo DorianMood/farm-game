@@ -41,7 +41,6 @@ export class Sh1710338492274 implements MigrationInterface {
     productRepo.save(products);
 
     // Questions
-    const questionRepo = queryRunner.connection.getRepository(Question);
     const questions = [];
     for (let i = 0; i < 5; i++) {
       const question = new Question();
@@ -49,16 +48,14 @@ export class Sh1710338492274 implements MigrationInterface {
       question.answer = "answer" + i;
       questions.push(question);
     }
-    questionRepo.save(questions);
+    // INFO: no need to save questions here, save with relation to survey
 
     // Survey
     const surveyRepo = queryRunner.manager.getRepository(Survey);
-    await surveyRepo.insert([
-      {
-        questions: questions,
-        task: surveyTask,
-      },
-    ]);
+    const survey = new Survey();
+    survey.task = surveyTask;
+    survey.questions = questions;
+    await surveyRepo.save(survey);
 
     await queryRunner.commitTransaction();
   }

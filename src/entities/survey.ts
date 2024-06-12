@@ -8,7 +8,7 @@ export class Survey {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @OneToMany(() => Question, (question) => question.survey)
+  @OneToMany(() => Question, (question) => question.survey, { cascade: true })
   questions!: Question[];
 
   @ManyToOne(() => Task)
