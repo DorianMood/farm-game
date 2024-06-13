@@ -16,9 +16,11 @@ passport.use(
         const userRepo = AppDataSource.getRepository(User);
 
         // Search a user whose username or email is the login parameter
-        const user = await userRepo.findOne({
-          where: [{ username: login }, { email: login }],
-        });
+        const user = await userRepo
+          .createQueryBuilder("user")
+          .addSelect(["user.salt", "user.hashPassword"])
+          .where([{ username: login }, { email: login }])
+          .getOne();
 
         // If the user doesn't exist or the password is wrong, return error as null and user as null
         // It allows to distinguish technical error and wrong credentials
