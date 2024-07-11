@@ -1,13 +1,11 @@
-import { Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, ManyToOne, OneToMany } from "typeorm";
 
 import { Question } from "./question";
 import { Task } from "./task";
+import { Id } from "./helpers";
 
 @Entity()
-export class Survey {
-  @PrimaryGeneratedColumn("uuid")
-  id!: string;
-
+export class Survey extends Id {
   @OneToMany(() => Question, (question) => question.survey, { cascade: true })
   questions!: Question[];
 

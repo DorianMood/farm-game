@@ -1,6 +1,7 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany } from "typeorm";
 
 import { UserTask } from "./user-task";
+import { Id } from "./helpers";
 
 export enum TaskEnum {
   Plant = "Plant",
@@ -9,11 +10,11 @@ export enum TaskEnum {
 }
 
 @Entity()
-export class Task {
-  @PrimaryGeneratedColumn("uuid")
-  id!: string;
-
-  @OneToMany(() => UserTask, (userTask) => userTask.task)
+export class Task extends Id {
+  @OneToMany(() => UserTask, (userTask) => userTask.task, {
+    cascade: true,
+    onDelete: "CASCADE",
+  })
   userTask!: UserTask[];
 
   @Column({ nullable: false, unique: false })

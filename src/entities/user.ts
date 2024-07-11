@@ -1,34 +1,14 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import bcrypt from 'bcryptjs';
+import { Column, Entity, JoinTable, ManyToMany, OneToMany } from "typeorm";
+import bcrypt from "bcryptjs";
 
-import { Bed } from './bed';
-import { UserTask } from './user-task';
-import { Product } from './product';
+import { Bed } from "./bed";
+import { UserTask } from "./user-task";
+import { Product } from "./product";
+import { Inventory } from "./inventory";
+import { IdDates } from "./helpers";
 
 @Entity()
-export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
-  @CreateDateColumn({ nullable: false })
-  createdAt!: Date;
-
-  @UpdateDateColumn({ nullable: false })
-  updatedAt!: Date;
-
-  @DeleteDateColumn({ nullable: true })
-  deletedAt!: Date | null;
-
+export class User extends IdDates {
   @Column({ nullable: false, unique: true, length: 20 })
   username!: string;
 
@@ -41,18 +21,21 @@ export class User {
   @Column({ nullable: false, select: false })
   salt!: string;
 
-  @OneToMany(() => Bed, (bed) => bed.user)
+  @OneToMany(() => Bed, (bed) => bed.user, { cascade: true })
   beds!: Bed[];
 
   @Column({ nullable: false, default: 0 })
   ballance!: number;
 
-  @OneToMany(() => UserTask, (task) => task.user)
+  @OneToMany(() => UserTask, (task) => task.user, { cascade: true })
   tasks!: UserTask[];
 
-  @ManyToMany(() => Product)
+  @ManyToMany(() => Product, (product) => product.users)
   @JoinTable()
   products!: Product[];
+
+  @OneToMany(() => Inventory, (inventory) => inventory.user, { cascade: true })
+  inventoryList!: Inventory[];
 
   setPassword(password: string) {
     this.salt = bcrypt.genSaltSync(12);

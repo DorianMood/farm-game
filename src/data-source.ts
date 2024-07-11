@@ -21,7 +21,7 @@ export const AppDataSource = new DataSource({
       ? process.env.TEST_DB_NAME
       : process.env.DB_NAME,
   logging: false,
-  synchronize: process.env.NODE_ENV === "test",
+  // synchronize: process.env.NODE_ENV !== "production",
   entities:
     process.env.NODE_ENV === "production"
       ? ["build/entities/**/*.js"]
@@ -35,4 +35,3 @@ export const AppDataSource = new DataSource({
       ? ["build/migrations/**/*.js"]
       : [join(__dirname, "./migrations/**/*.ts")],
 });
-

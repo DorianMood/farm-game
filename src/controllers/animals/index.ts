@@ -1,30 +1,30 @@
 import createHttpError from "http-errors";
 import type { Request, Response } from "express";
-import { IsNull, LessThan } from "typeorm";
+// import { IsNull, LessThan } from "typeorm";
 
 import { AppDataSource } from "../../data-source";
-import { Bed } from "../../entities/bed";
-import {
-  BED_GROWING_TIMEOUT,
-  BED_PLANT_REWARD,
-  BED_HARVEST_REWARD,
-} from "../../common/constants";
-import { CropEnum } from "../../common/enums";
-import { validateHarvestBody, validatePlantBody } from "./validators";
+// import { Animal } from "../../entities/animal";
+// import {
+//   BED_GROWING_TIMEOUT,
+//   BED_PLANT_REWARD,
+//   BED_HARVEST_REWARD,
+// } from "../../common/constants";
+// import { CropEnum } from "../../common/enums";
+// import { validateHarvestBody, validateStartBody } from "./validators";
 
-const retrieve = async (req: Request, res: Response) => {
+const retrieve = (req: Request, res: Response) => {
   if (req.isUnauthenticated()) {
     throw createHttpError(401, "User is not authentificated");
   }
 
-  const bedsQueryBuilder =
-    AppDataSource.getRepository(Bed).createQueryBuilder("bed");
+  // const bedsQueryBuilder =
+  //   AppDataSource.getRepository(Animal).createQueryBuilder("animal");
+  //
+  // const beds = await bedsQueryBuilder
+  //   .where("bed.user = :userId", { userId: req.user?.id })
+  //   .getMany();
 
-  const beds = await bedsQueryBuilder
-    .where("bed.user = :userId", { userId: req.user?.id })
-    .getMany();
-
-  return res.json(beds);
+  return res.json([]);
 };
 
 const harvest = async (req: Request, res: Response) => {
@@ -32,7 +32,7 @@ const harvest = async (req: Request, res: Response) => {
     throw createHttpError(401, "User is not authentificated");
   }
 
-  const { index } = validateHarvestBody(req.body);
+  // const { index } = validateHarvestBody(req.body);
 
   // Create a query runner to control the transactions, it allows to cancel the transaction if we need to
   const queryRunner = AppDataSource.createQueryRunner();
@@ -48,39 +48,39 @@ const harvest = async (req: Request, res: Response) => {
       throw createHttpError(401, "User is not authentificated");
     }
 
-    const bedRepo = queryRunner.manager.getRepository(Bed);
-
-    const bedExists = await bedRepo.exist({
-      where: { index: index, user: { id: user.id } },
-    });
-
-    if (!bedExists) {
-      throw createHttpError(404, "Bed with given index not found");
-    }
-
-    const bedReady = await bedRepo.exist({
-      where: {
-        index: index,
-        user: { id: user.id },
-        plantedAt: LessThan(
-          new Date(Date.now() - BED_GROWING_TIMEOUT).toISOString(),
-        ),
-      },
-    });
-
-    if (!bedReady) {
-      throw createHttpError(409, "Bed is not ready");
-    }
-
-    await queryRunner.manager.update(
-      Bed,
-      { index, user },
-      { plantedAt: null, crop: null },
-    );
-
-    user.ballance += BED_HARVEST_REWARD;
-
-    await queryRunner.manager.save(user);
+    // const bedRepo = queryRunner.manager.getRepository(Bed);
+    //
+    // const bedExists = await bedRepo.exist({
+    //   where: { index: index, user: { id: user.id } },
+    // });
+    //
+    // if (!bedExists) {
+    //   throw createHttpError(404, "Bed with given index not found");
+    // }
+    //
+    // const bedReady = await bedRepo.exist({
+    //   where: {
+    //     index: index,
+    //     user: { id: user.id },
+    //     plantedAt: LessThan(
+    //       new Date(Date.now() - BED_GROWING_TIMEOUT).toISOString(),
+    //     ),
+    //   },
+    // });
+    //
+    // if (!bedReady) {
+    //   throw createHttpError(409, "Bed is not ready");
+    // }
+    //
+    // await queryRunner.manager.update(
+    //   Bed,
+    //   { index, user },
+    //   { plantedAt: null, crop: null },
+    // );
+    //
+    // user.ballance += BED_HARVEST_REWARD;
+    //
+    // await queryRunner.manager.save(user);
 
     await queryRunner.commitTransaction();
     // We need to release the query runner to not keep a useless connection to the database
@@ -99,12 +99,12 @@ const harvest = async (req: Request, res: Response) => {
   }
 };
 
-const plant = async (req: Request, res: Response) => {
+const start = async (req: Request, res: Response) => {
   if (req.isUnauthenticated()) {
     throw createHttpError(401, "User is not authentificated");
   }
 
-  const { index, crop } = validatePlantBody(req.body);
+  // const { index, crop } = validateStartBody(req.body);
 
   // Create a query runner to control the transactions, it allows to cancel the transaction if we need to
   const queryRunner = AppDataSource.createQueryRunner();
@@ -120,37 +120,37 @@ const plant = async (req: Request, res: Response) => {
       throw createHttpError(401, "User is not authentificated");
     }
 
-    const bedRepo = queryRunner.manager.getRepository(Bed);
-
-    const bedExists = await bedRepo.exist({
-      where: { index: index, user: { id: user.id } },
-    });
-
-    if (!bedExists) {
-      throw createHttpError(404, "Bed with given index not found");
-    }
-
-    const bedReady = await bedRepo.exist({
-      where: {
-        index: index,
-        user: { id: user.id },
-        crop: IsNull(),
-      },
-    });
-
-    if (!bedReady) {
-      throw createHttpError(409, "Bed is not empty");
-    }
-
-    await queryRunner.manager.update(
-      Bed,
-      { index, user },
-      { plantedAt: new Date().toISOString(), crop: CropEnum[crop] },
-    );
-
-    user.ballance += BED_PLANT_REWARD;
-
-    await queryRunner.manager.save(user);
+    // const bedRepo = queryRunner.manager.getRepository(Bed);
+    //
+    // const bedExists = await bedRepo.exist({
+    //   where: { index: index, user: { id: user.id } },
+    // });
+    //
+    // if (!bedExists) {
+    //   throw createHttpError(404, "Bed with given index not found");
+    // }
+    //
+    // const bedReady = await bedRepo.exist({
+    //   where: {
+    //     index: index,
+    //     user: { id: user.id },
+    //     crop: IsNull(),
+    //   },
+    // });
+    //
+    // if (!bedReady) {
+    //   throw createHttpError(409, "Bed is not empty");
+    // }
+    //
+    // await queryRunner.manager.update(
+    //   Bed,
+    //   { index, user },
+    //   { plantedAt: new Date().toISOString(), crop: CropEnum[crop] },
+    // );
+    //
+    // user.ballance += BED_PLANT_REWARD;
+    //
+    // await queryRunner.manager.save(user);
 
     await queryRunner.commitTransaction();
 
@@ -173,5 +173,5 @@ const plant = async (req: Request, res: Response) => {
 export default {
   retrieve,
   harvest,
-  plant,
+  start,
 };

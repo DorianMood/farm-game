@@ -1,12 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne } from "typeorm";
 
 import { Survey } from "./survey";
+import { Id } from "./helpers";
 
 @Entity()
-export class Question {
-  @PrimaryGeneratedColumn("uuid")
-  id!: string;
-
+export class Question extends Id {
   @ManyToOne(() => Survey, (survey) => survey.questions)
   survey!: Survey;
 

@@ -1,26 +1,10 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from "typeorm";
+import { Column, Entity, ManyToMany } from "typeorm";
+
+import { User } from "./user";
+import { IdDates } from "./helpers";
 
 @Entity()
-export class Product {
-  @PrimaryGeneratedColumn("uuid")
-  id!: string;
-
-  @CreateDateColumn({ nullable: false })
-  createdAt!: Date;
-
-  @UpdateDateColumn({ nullable: false })
-  updatedAt!: Date;
-
-  @DeleteDateColumn({ nullable: true })
-  deletedAt!: Date | null;
-
+export class Product extends IdDates {
   @Column({ nullable: false, unique: false })
   name!: string;
 
@@ -32,4 +16,7 @@ export class Product {
 
   @Column({ nullable: false, unique: false })
   content!: string;
+
+  @ManyToMany(() => User, (user) => user.products)
+  users!: User[];
 }

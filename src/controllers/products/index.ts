@@ -1,23 +1,76 @@
 import type { Request, Response } from "express";
 import createHttpError from "http-errors";
 
-import { LessThanOrEqual } from "typeorm";
+import { LessThanOrEqual, Not } from "typeorm";
+
+import {
+  RetrieveProductsFilterEnum,
+  type RetrieveProductsQuery,
+} from "../../types/routes/products";
 
 import { AppDataSource } from "../../data-source";
 import { Product } from "../../entities/product";
 import { validatePurchaseBody } from "./validators";
 
-const retrieve = async (req: Request, res: Response) => {
-  if (req.isUnauthenticated()) {
+const retrieve = async (
+  req: Request<unknown, unknown, unknown, RetrieveProductsQuery>,
+  res: Response,
+) => {
+  const user = req.user;
+
+  if (!user) {
     throw createHttpError(401, "User is not authentificated");
   }
 
-  const productsQueryBuilder =
-    AppDataSource.getRepository(Product).createQueryBuilder("product");
+  // all, available, mine
+  const { filter } = req.query;
 
-  const products = await productsQueryBuilder.getMany();
+  const productsRepository = AppDataSource.getRepository(Product);
 
-  return res.json(products);
+  switch (filter) {
+    case RetrieveProductsFilterEnum.available: {
+      // Select products available for purchase
+      const availableProducts = await productsRepository.find({
+        where: {
+          price: LessThanOrEqual(user.ballance),
+          users: Not(user),
+        },
+      });
+
+      // productsRepository.find({
+      //   join: {
+      //     alias: "users",
+      //   },
+      //   where: (db) => db.where("users.id = :id", { id: user.id }),
+      // });
+
+      productsRepository
+        .createQueryBuilder("product")
+        .where("product.price <= :price", { price: user.ballance })
+        .andWhere("product.users NOT LIKE :id", { id: user.id });
+
+      return res.json(availableProducts);
+    }
+    case RetrieveProductsFilterEnum.mine: {
+      // Select purchased products
+      // const purchasedProducts = await productsRepository.find({
+      //   where: {
+      //     users: user,
+      //   },
+      // });
+      break;
+    }
+    case RetrieveProductsFilterEnum.all: {
+      // Select all products
+      await productsRepository.find();
+      break;
+    }
+    default: {
+      // Select all products
+      // await productsRepository.queryRunner
+      break;
+    }
+  }
 };
 
 const purchase = async (req: Request, res: Response) => {

@@ -1,27 +1,16 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne } from "typeorm";
+
+import { CropEnum } from "../common/enums";
 
 import { User } from "./user";
-
-export enum CropEnum {
-  Carrot = "Carrot",
-  Potato = "Potato",
-  Beet = "Beet",
-  Wheat = "Wheat",
-  Flower = "Flower",
-}
+import { Id } from "./helpers";
 
 @Entity()
-export class Bed {
-  @PrimaryGeneratedColumn("uuid")
-  id!: string;
-
+export class Bed extends Id {
   @Column({ nullable: false })
   index!: number;
 
-  @ManyToOne(() => User, (user) => user.beds, {
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE",
-  })
+  @ManyToOne(() => User, (user) => user.beds)
   user!: User;
 
   @Column({ type: "timestamptz", nullable: true })
@@ -33,5 +22,5 @@ export class Bed {
     nullable: true,
     default: null,
   })
-  crop!: string | null;
+  crop!: CropEnum | null;
 }

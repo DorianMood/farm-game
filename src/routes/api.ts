@@ -7,6 +7,7 @@ import bedsRoutes from "./beds";
 import tasksRoutes from "./tasks";
 import productsRoutes from "./products";
 import surveysRoutes from "./surveys";
+import animalsRoutes from "./animals";
 
 const router = express.Router();
 
@@ -16,6 +17,7 @@ router.use("/beds", bedsRoutes);
 router.use("/tasks", tasksRoutes);
 router.use("/products", productsRoutes);
 router.use("/surveys", surveysRoutes);
+router.use("/animals", animalsRoutes);
 
 router.route("/health").get((req, res) => res.send("Server is up!"));
 

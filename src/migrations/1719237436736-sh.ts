@@ -4,9 +4,19 @@ import { Question } from "../entities/question";
 import { Survey } from "../entities/survey";
 import { Task, TaskEnum } from "../entities/task";
 
-export class Sh1710338492274 implements MigrationInterface {
+/**
+ * INFO:
+ * This a data migration, it will be executed when the database is first created.
+ * It doesnt change the database schema but only fill the database with data.
+ **/
+
+// INFO: this migration creates products, tasks, questions and surveys
+
+export class Sh1719237436736 implements MigrationInterface {
+  name = "Sh1719237436736";
+
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.connect();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     await queryRunner.startTransaction();
 
     // Tasks
@@ -24,21 +34,21 @@ export class Sh1710338492274 implements MigrationInterface {
     gameTask.type = TaskEnum.CustomGame;
     gameTask.cost = 100;
 
-    taskRepo.save([plantTask, surveyTask, gameTask]);
+    await taskRepo.save([plantTask, surveyTask, gameTask]);
 
     // Products
-    const productRepo = queryRunner.connection.getRepository(Product);
+    const productRepo = queryRunner.manager.getRepository(Product);
 
     const products = [];
     for (let i = 0; i < 5; i++) {
       const product = new Product();
-      product.name = "product" + i;
+      product.name = "промокод " + i;
       product.price = i;
       product.content = "content";
       product.picture = "";
       products.push(product);
     }
-    productRepo.save(products);
+    await productRepo.save(products);
 
     // Questions
     const questions = [];
@@ -61,16 +71,16 @@ export class Sh1710338492274 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    const taskRepo = queryRunner.connection.getRepository(Task);
-    taskRepo.clear();
+    const taskRepo = queryRunner.manager.getRepository(Task);
+    await taskRepo.clear();
 
-    const productRepo = queryRunner.connection.getRepository(Product);
-    productRepo.clear();
+    const productRepo = queryRunner.manager.getRepository(Product);
+    await productRepo.clear();
 
-    const questionRepo = queryRunner.connection.getRepository(Question);
-    questionRepo.clear();
+    const questionRepo = queryRunner.manager.getRepository(Question);
+    await questionRepo.clear();
 
-    const surveyRepo = queryRunner.connection.getRepository(Survey);
-    surveyRepo.clear();
+    const surveyRepo = queryRunner.manager.getRepository(Survey);
+    await surveyRepo.clear();
   }
 }
