@@ -1,18 +1,60 @@
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, OneToOne } from "typeorm";
 
-import { Id } from "./helpers";
-import { Inventory } from "./inventory";
-import { FarmProduct } from "./farm-product";
+import { InventoryItemCategoryEnum } from "../common/enums";
+
+import { IdDates } from "./helpers";
+import { Animal } from "./animal";
+import { Seed } from "./seed";
+import { AnimalProduct } from "./animal-product";
+import { SeedProduct } from "./seed-product";
 
 @Entity()
-export class InventorySlot extends Id {
-  @ManyToOne(() => Inventory, (inventory) => inventory.items)
-  inventory!: Inventory;
+export class InventoryItem extends IdDates {
+  @Column({ nullable: false })
+  name!: string;
 
-  @Column()
-  amount!: number;
+  @Column({ nullable: false, type: "text" })
+  description!: string;
 
-  @ManyToOne(() => FarmProduct)
-  @JoinColumn()
-  farmProduct!: FarmProduct;
+  @Column({ nullable: false })
+  price!: number;
+
+  @Column({ nullable: false })
+  sellMultiplier!: number;
+
+  @Column({
+    type: "enum",
+    enum: InventoryItemCategoryEnum,
+    nullable: true,
+    default: null,
+  })
+  category!: InventoryItemCategoryEnum | null;
+
+  @OneToOne(() => Animal, (animal) => animal.inventoryItem, {
+    nullable: true,
+    cascade: true,
+  })
+  animal?: Animal;
+
+  @OneToOne(() => Seed, (seed) => seed.inventoryItem, {
+    nullable: true,
+    cascade: true,
+  })
+  seed?: Seed;
+
+  @OneToOne(
+    () => AnimalProduct,
+    (animalProduct) => animalProduct.inventoryItem,
+    {
+      nullable: true,
+      cascade: true,
+    },
+  )
+  animalProduct?: AnimalProduct;
+
+  @OneToOne(() => SeedProduct, (seedProduct) => seedProduct.inventoryItem, {
+    nullable: true,
+    cascade: true,
+  })
+  seedProduct?: SeedProduct;
 }

@@ -6,6 +6,43 @@ import { Survey } from "../entities/survey";
 import { Task, TaskEnum } from "../entities/task";
 import { UserTask } from "../entities/user-task";
 
+const surveys = [
+  [
+    { question: "Обесценивание денег", answer: "Инфляция" },
+    { question: "Иностранные деньги", answer: "Валюта" },
+    {
+      question: "Когда банк платит проценты от вложенных денег",
+      answer: "Валюта",
+    },
+    { question: "Когда берешь деньги в долг у банка", answer: "Кредит" },
+  ],
+  [
+    { question: "Обесценивание товаров и услуг", answer: "Дефляция" },
+    {
+      question:
+        "Вложение денег на фиксированный срок для получения фиксированного процента",
+      answer: "Вклад",
+    },
+    {
+      question: "14 лет",
+      answer: "C какого возраста можно оформить банковскую карту в России?",
+    },
+    { question: "Кредит на покупку жилья", answer: "Ипотека" },
+  ],
+  [
+    { question: "Владельцы акций предприятия", answer: "Акционеры" },
+    {
+      question:
+        "Часть прибыли предприятия, которая распределяется между его акционерами",
+      answer: "Дивиденды",
+    },
+    {
+      question: "Вложение денег с целью их преумножения",
+      answer: "Инвестиции",
+    },
+  ],
+];
+
 export class Sh2000000000000 implements MigrationInterface {
   name = "Sh2000000000000";
 
@@ -46,10 +83,10 @@ export class Sh2000000000000 implements MigrationInterface {
 
     // Questions
     const questions: Question[] = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < surveys[0].length; i++) {
       const question = new Question();
-      question.question = "question" + i;
-      question.answer = "answer" + i;
+      question.question = surveys[0][i].question;
+      question.answer = surveys[0][i].answer;
       questions.push(question);
     }
     // INFO: no need to save questions here, save with relation to survey

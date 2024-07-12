@@ -2,15 +2,15 @@ import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
 
 import { Id } from "./helpers";
 import { SeedEnum } from "../common/enums";
-import { FarmProduct } from "./farm-product";
+import { InventoryItem } from "./inventory-item";
 
 @Entity()
 export class Seed extends Id {
-  @OneToOne(() => FarmProduct, (farmProduct) => farmProduct.seed, {
+  @OneToOne(() => InventoryItem, (inventoryItem) => inventoryItem.seed, {
     onDelete: "CASCADE",
   })
   @JoinColumn()
-  farmProduct!: FarmProduct;
+  inventoryItem!: InventoryItem;
 
   @Column({
     type: "enum",

@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 
 import { Id } from "./helpers";
 import { Inventory } from "./inventory";
-import { FarmProduct } from "./farm-product";
+import { InventoryItem } from "./inventory-item";
 
 @Entity()
 export class InventorySlot extends Id {
@@ -15,10 +15,10 @@ export class InventorySlot extends Id {
   @Column()
   amount!: number;
 
-  @ManyToOne(() => FarmProduct, {
+  @ManyToOne(() => InventoryItem, {
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
   })
   @JoinColumn()
-  farmProduct!: FarmProduct;
+  inventoryItem!: InventoryItem;
 }
