@@ -42,7 +42,7 @@ export class User extends IdDates {
   @OneToOne(() => Inventory, (inventory) => inventory.user, {
     cascade: true,
   })
-  inventoryList!: Inventory;
+  inventory!: Inventory;
 
   setPassword(password: string) {
     this.salt = bcrypt.genSaltSync(12);

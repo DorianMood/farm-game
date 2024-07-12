@@ -2,10 +2,13 @@ import type { Request, Response } from "express";
 import createHttpError from "http-errors";
 
 import { AppDataSource } from "../../data-source";
+
 import { User } from "../../entities/user";
 import { Bed } from "../../entities/bed";
 import { Task } from "../../entities/task";
 import { UserTask } from "../../entities/user-task";
+import { Inventory } from "../../entities/inventory";
+
 import type { UsersCreateBody } from "../../types/routes/users";
 import { validateCreateBody } from "./validators";
 
@@ -101,6 +104,10 @@ const create = async (
       newBeds.push(newBed);
     }
     newUser.beds = newBeds;
+
+    // Create an inventory for new user
+    const newInventory = new Inventory();
+    newUser.inventory = newInventory;
 
     await queryRunner.manager.save(newUser);
 

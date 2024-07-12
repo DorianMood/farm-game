@@ -6,7 +6,7 @@ import { InventorySlot } from "./inventory-slot";
 
 @Entity()
 export class Inventory extends IdDates {
-  @OneToOne(() => User, (user) => user.inventoryList, {
+  @OneToOne(() => User, (user) => user.inventory, {
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
   })
