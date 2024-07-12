@@ -1,4 +1,4 @@
-import { Column, Entity, JoinTable, ManyToMany, OneToMany } from "typeorm";
+import { Column, Entity, ManyToMany, OneToMany, OneToOne } from "typeorm";
 import bcrypt from "bcryptjs";
 
 import { Bed } from "./bed";
@@ -21,21 +21,28 @@ export class User extends IdDates {
   @Column({ nullable: false, select: false })
   salt!: string;
 
-  @OneToMany(() => Bed, (bed) => bed.user, { cascade: true })
+  @OneToMany(() => Bed, (bed) => bed.user, {
+    cascade: true,
+  })
   beds!: Bed[];
 
   @Column({ nullable: false, default: 0 })
   ballance!: number;
 
-  @OneToMany(() => UserTask, (task) => task.user, { cascade: true })
+  @OneToMany(() => UserTask, (task) => task.user, {
+    cascade: true,
+  })
   tasks!: UserTask[];
 
-  @ManyToMany(() => Product, (product) => product.users)
-  @JoinTable()
+  @ManyToMany(() => Product, (product) => product.users, {
+    cascade: true,
+  })
   products!: Product[];
 
-  @OneToMany(() => Inventory, (inventory) => inventory.user, { cascade: true })
-  inventoryList!: Inventory[];
+  @OneToOne(() => Inventory, (inventory) => inventory.user, {
+    cascade: true,
+  })
+  inventoryList!: Inventory;
 
   setPassword(password: string) {
     this.salt = bcrypt.genSaltSync(12);

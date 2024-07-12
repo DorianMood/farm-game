@@ -6,13 +6,19 @@ import { FarmProduct } from "./farm-product";
 
 @Entity()
 export class InventorySlot extends Id {
-  @ManyToOne(() => Inventory, (inventory) => inventory.items)
+  @ManyToOne(() => Inventory, (inventory) => inventory.items, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
   inventory!: Inventory;
 
   @Column()
   amount!: number;
 
-  @ManyToOne(() => FarmProduct)
+  @ManyToOne(() => FarmProduct, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
   @JoinColumn()
   farmProduct!: FarmProduct;
 }

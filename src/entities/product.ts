@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToMany } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany } from "typeorm";
 
 import { User } from "./user";
 import { IdDates } from "./helpers";
@@ -17,6 +17,10 @@ export class Product extends IdDates {
   @Column({ nullable: false, unique: false })
   content!: string;
 
-  @ManyToMany(() => User, (user) => user.products)
+  @ManyToMany(() => User, (user) => user.products, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
+  @JoinTable()
   users!: User[];
 }

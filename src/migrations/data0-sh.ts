@@ -1,19 +1,13 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
+
 import { Product } from "../entities/product";
 import { Question } from "../entities/question";
 import { Survey } from "../entities/survey";
 import { Task, TaskEnum } from "../entities/task";
+import { UserTask } from "../entities/user-task";
 
-/**
- * INFO:
- * This a data migration, it will be executed when the database is first created.
- * It doesnt change the database schema but only fill the database with data.
- **/
-
-// INFO: this migration creates products, tasks, questions and surveys
-
-export class Sh1719237436736 implements MigrationInterface {
-  name = "Sh1719237436736";
+export class Sh2000000000000 implements MigrationInterface {
+  name = "Sh2000000000000";
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -39,7 +33,7 @@ export class Sh1719237436736 implements MigrationInterface {
     // Products
     const productRepo = queryRunner.manager.getRepository(Product);
 
-    const products = [];
+    const products: Product[] = [];
     for (let i = 0; i < 5; i++) {
       const product = new Product();
       product.name = "промокод " + i;
@@ -51,7 +45,7 @@ export class Sh1719237436736 implements MigrationInterface {
     await productRepo.save(products);
 
     // Questions
-    const questions = [];
+    const questions: Question[] = [];
     for (let i = 0; i < 5; i++) {
       const question = new Question();
       question.question = "question" + i;
@@ -71,16 +65,19 @@ export class Sh1719237436736 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    const userTaskRepo = queryRunner.manager.getRepository(UserTask);
+    userTaskRepo.delete({});
+
     const taskRepo = queryRunner.manager.getRepository(Task);
-    await taskRepo.clear();
+    await taskRepo.delete({});
 
     const productRepo = queryRunner.manager.getRepository(Product);
-    await productRepo.clear();
+    await productRepo.delete({});
 
     const questionRepo = queryRunner.manager.getRepository(Question);
-    await questionRepo.clear();
+    await questionRepo.delete({});
 
     const surveyRepo = queryRunner.manager.getRepository(Survey);
-    await surveyRepo.clear();
+    await surveyRepo.delete({});
   }
 }

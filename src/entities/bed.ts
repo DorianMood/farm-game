@@ -10,7 +10,10 @@ export class Bed extends Id {
   @Column({ nullable: false })
   index!: number;
 
-  @ManyToOne(() => User, (user) => user.beds)
+  @ManyToOne(() => User, (user) => user.beds, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
   user!: User;
 
   @Column({ type: "timestamptz", nullable: true })

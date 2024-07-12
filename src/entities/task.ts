@@ -13,7 +13,6 @@ export enum TaskEnum {
 export class Task extends Id {
   @OneToMany(() => UserTask, (userTask) => userTask.task, {
     cascade: true,
-    onDelete: "CASCADE",
   })
   userTask!: UserTask[];
 

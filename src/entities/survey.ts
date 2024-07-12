@@ -6,9 +6,11 @@ import { Id } from "./helpers";
 
 @Entity()
 export class Survey extends Id {
-  @OneToMany(() => Question, (question) => question.survey, { cascade: true })
+  @OneToMany(() => Question, (question) => question.survey, {
+    cascade: true,
+  })
   questions!: Question[];
 
-  @ManyToOne(() => Task)
+  @ManyToOne(() => Task, { onDelete: "CASCADE" })
   task!: Task;
 }

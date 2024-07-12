@@ -5,7 +5,10 @@ import { Id } from "./helpers";
 
 @Entity()
 export class Question extends Id {
-  @ManyToOne(() => Survey, (survey) => survey.questions)
+  @ManyToOne(() => Survey, (survey) => survey.questions, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
   survey!: Survey;
 
   @Column({ nullable: false })

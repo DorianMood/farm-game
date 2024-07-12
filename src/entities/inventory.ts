@@ -1,14 +1,19 @@
-import { Entity, ManyToOne, OneToMany } from "typeorm";
+import { Entity, OneToMany, OneToOne } from "typeorm";
 
 import { User } from "./user";
 import { IdDates } from "./helpers";
-import { InventoryItem } from "./inventory-item";
+import { InventorySlot } from "./inventory-slot";
 
 @Entity()
 export class Inventory extends IdDates {
-  @ManyToOne(() => User, (user) => user.inventoryList)
+  @OneToOne(() => User, (user) => user.inventoryList, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
   user!: User;
 
-  @OneToMany(() => InventoryItem, (item) => item.inventory, { cascade: true })
-  items!: InventoryItem[];
+  @OneToMany(() => InventorySlot, (item) => item.inventory, {
+    cascade: true,
+  })
+  items!: InventorySlot[];
 }

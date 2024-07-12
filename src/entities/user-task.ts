@@ -6,10 +6,16 @@ import { Id } from "./helpers";
 
 @Entity()
 export class UserTask extends Id {
-  @ManyToOne(() => User, (user) => user.tasks)
+  @ManyToOne(() => User, (user) => user.tasks, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
   user!: User;
 
-  @ManyToOne(() => Task, (task) => task.userTask)
+  @ManyToOne(() => Task, (task) => task.userTask, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
   task!: Task;
 
   @Column({ type: "timestamptz", nullable: true })

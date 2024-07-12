@@ -1,12 +1,12 @@
 import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
 
+import { AnimalProductEnum } from "../common/enums";
 import { Id } from "./helpers";
-import { AnimalEnum } from "../common/enums";
 import { FarmProduct } from "./farm-product";
 
 @Entity()
-export class Animal extends Id {
-  @OneToOne(() => FarmProduct, (farmProduct) => farmProduct.animal, {
+export class AnimalProduct extends Id {
+  @OneToOne(() => FarmProduct, (farmProduct) => farmProduct.animalProduct, {
     onDelete: "CASCADE",
   })
   @JoinColumn()
@@ -14,11 +14,8 @@ export class Animal extends Id {
 
   @Column({
     type: "enum",
-    enum: AnimalEnum,
+    enum: AnimalProductEnum,
     unique: true,
   })
-  type!: AnimalEnum;
-
-  @Column({ nullable: false })
-  harvestTimeout!: number;
+  type!: AnimalProductEnum;
 }
