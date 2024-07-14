@@ -18,6 +18,7 @@ export enum InventoryItemCategoryEnum {
   Animal = "Animal",
   SeedProduct = "SeedProduct",
   AnimalProduct = "AnimalProduct",
+  PromoCode = "PromoCode",
 }
 
 export enum SeedEnum {

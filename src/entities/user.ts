@@ -1,4 +1,11 @@
-import { Column, Entity, ManyToMany, OneToMany, OneToOne } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToMany,
+  OneToMany,
+  OneToOne,
+} from "typeorm";
 import bcrypt from "bcryptjs";
 
 import { Bed } from "./bed";
@@ -42,6 +49,7 @@ export class User extends IdDates {
   @OneToOne(() => Inventory, (inventory) => inventory.user, {
     cascade: true,
   })
+  @JoinColumn()
   inventory!: Inventory;
 
   setPassword(password: string) {

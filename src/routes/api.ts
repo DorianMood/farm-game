@@ -8,6 +8,7 @@ import tasksRoutes from "./tasks";
 import productsRoutes from "./products";
 import surveysRoutes from "./surveys";
 import animalsRoutes from "./animals";
+import inventoryRoutes from "./inventory";
 
 const router = express.Router();
 
@@ -18,6 +19,7 @@ router.use("/tasks", tasksRoutes);
 router.use("/products", productsRoutes);
 router.use("/surveys", surveysRoutes);
 router.use("/animals", animalsRoutes);
+router.use("/inventory", inventoryRoutes);
 
 router.route("/health").get((req, res) => res.send("Server is up!"));
 
