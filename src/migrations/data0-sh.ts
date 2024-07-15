@@ -1,6 +1,5 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-import { Product } from "../entities/product";
 import { Question } from "../entities/question";
 import { Survey } from "../entities/survey";
 import { Task, TaskEnum } from "../entities/task";
@@ -67,20 +66,6 @@ export class Sh2000000000000 implements MigrationInterface {
 
     await taskRepo.save([plantTask, surveyTask, gameTask]);
 
-    // Products
-    const productRepo = queryRunner.manager.getRepository(Product);
-
-    const products: Product[] = [];
-    for (let i = 0; i < 5; i++) {
-      const product = new Product();
-      product.name = "промокод " + i;
-      product.price = i;
-      product.content = "content";
-      product.picture = "";
-      products.push(product);
-    }
-    await productRepo.save(products);
-
     // Questions
     const questions: Question[] = [];
     for (let i = 0; i < surveys[0].length; i++) {
@@ -107,9 +92,6 @@ export class Sh2000000000000 implements MigrationInterface {
 
     const taskRepo = queryRunner.manager.getRepository(Task);
     await taskRepo.delete({});
-
-    const productRepo = queryRunner.manager.getRepository(Product);
-    await productRepo.delete({});
 
     const questionRepo = queryRunner.manager.getRepository(Question);
     await questionRepo.delete({});

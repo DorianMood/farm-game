@@ -1,16 +1,8 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToMany,
-  OneToMany,
-  OneToOne,
-} from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from "typeorm";
 import bcrypt from "bcryptjs";
 
 import { Bed } from "./bed";
 import { UserTask } from "./user-task";
-import { Product } from "./product";
 import { Inventory } from "./inventory";
 import { IdDates } from "./helpers";
 
@@ -40,11 +32,6 @@ export class User extends IdDates {
     cascade: true,
   })
   tasks!: UserTask[];
-
-  @ManyToMany(() => Product, (product) => product.users, {
-    cascade: true,
-  })
-  products!: Product[];
 
   @OneToOne(() => Inventory, (inventory) => inventory.user, {
     cascade: true,
