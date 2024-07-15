@@ -34,12 +34,14 @@ export class InventoryItem extends IdDates {
   @OneToOne(() => Animal, (animal) => animal.inventoryItem, {
     nullable: true,
     cascade: true,
+    eager: true,
   })
   animal?: Animal;
 
   @OneToOne(() => Seed, (seed) => seed.inventoryItem, {
     nullable: true,
     cascade: true,
+    eager: true,
   })
   seed?: Seed;
 
@@ -49,6 +51,7 @@ export class InventoryItem extends IdDates {
     {
       nullable: true,
       cascade: true,
+      eager: true,
     },
   )
   animalProduct?: AnimalProduct;
@@ -56,12 +59,14 @@ export class InventoryItem extends IdDates {
   @OneToOne(() => SeedProduct, (seedProduct) => seedProduct.inventoryItem, {
     nullable: true,
     cascade: true,
+    eager: true,
   })
   seedProduct?: SeedProduct;
 
   @OneToOne(() => PromoCode, (promoCode) => promoCode.inventoryItem, {
     nullable: true,
     cascade: true,
+    eager: true,
   })
   promoCode?: PromoCode;
 }

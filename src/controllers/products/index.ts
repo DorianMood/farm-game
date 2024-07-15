@@ -1,16 +1,17 @@
 import type { Request, Response } from "express";
 import createHttpError from "http-errors";
 
-import { LessThanOrEqual, Not } from "typeorm";
+import { LessThanOrEqual } from "typeorm";
 
 import {
-  RetrieveProductsFilterEnum,
+  // RetrieveProductsFilterEnum,
   type RetrieveProductsQuery,
 } from "../../types/routes/products";
 
 import { AppDataSource } from "../../data-source";
 import { Product } from "../../entities/product";
 import { validatePurchaseBody } from "./validators";
+import { InventoryItem } from "../..//entities/inventory-item";
 
 const retrieve = async (
   req: Request<unknown, unknown, unknown, RetrieveProductsQuery>,
@@ -23,54 +24,61 @@ const retrieve = async (
   }
 
   // all, available, mine
-  const { filter } = req.query;
+  // const { filter } = req.query;
 
-  const productsRepository = AppDataSource.getRepository(Product);
+  // const productsRepository = AppDataSource.getRepository(Product);
+  const inventoryItemsRepository = AppDataSource.getRepository(InventoryItem);
 
-  switch (filter) {
-    case RetrieveProductsFilterEnum.available: {
-      // Select products available for purchase
-      const availableProducts = await productsRepository.find({
-        where: {
-          price: LessThanOrEqual(user.ballance),
-          users: Not(user),
-        },
-      });
+  const allInventoryItems = await inventoryItemsRepository.find({
+    loadEagerRelations: true,
+  });
 
-      // productsRepository.find({
-      //   join: {
-      //     alias: "users",
-      //   },
-      //   where: (db) => db.where("users.id = :id", { id: user.id }),
-      // });
+  return res.json(allInventoryItems);
 
-      productsRepository
-        .createQueryBuilder("product")
-        .where("product.price <= :price", { price: user.ballance })
-        .andWhere("product.users NOT LIKE :id", { id: user.id });
-
-      return res.json(availableProducts);
-    }
-    case RetrieveProductsFilterEnum.mine: {
-      // Select purchased products
-      // const purchasedProducts = await productsRepository.find({
-      //   where: {
-      //     users: user,
-      //   },
-      // });
-      break;
-    }
-    case RetrieveProductsFilterEnum.all: {
-      // Select all products
-      await productsRepository.find();
-      break;
-    }
-    default: {
-      // Select all products
-      // await productsRepository.queryRunner
-      break;
-    }
-  }
+  // switch (filter) {
+  //   case RetrieveProductsFilterEnum.available: {
+  //     // Select products available for purchase
+  //     const availableProducts = await productsRepository.find({
+  //       where: {
+  //         price: LessThanOrEqual(user.ballance),
+  //         users: Not(user),
+  //       },
+  //     });
+  //
+  //     // productsRepository.find({
+  //     //   join: {
+  //     //     alias: "users",
+  //     //   },
+  //     //   where: (db) => db.where("users.id = :id", { id: user.id }),
+  //     // });
+  //
+  //     productsRepository
+  //       .createQueryBuilder("product")
+  //       .where("product.price <= :price", { price: user.ballance })
+  //       .andWhere("product.users NOT LIKE :id", { id: user.id });
+  //
+  //     return res.json(availableProducts);
+  //   }
+  //   case RetrieveProductsFilterEnum.mine: {
+  //     // Select purchased products
+  //     // const purchasedProducts = await productsRepository.find({
+  //     //   where: {
+  //     //     users: user,
+  //     //   },
+  //     // });
+  //     break;
+  //   }
+  //   case RetrieveProductsFilterEnum.all: {
+  //     // Select all products
+  //     await productsRepository.find();
+  //     break;
+  //   }
+  //   default: {
+  //     // Select all products
+  //     // await productsRepository.queryRunner
+  //     break;
+  //   }
+  // }
 };
 
 const purchase = async (req: Request, res: Response) => {
