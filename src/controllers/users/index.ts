@@ -29,7 +29,6 @@ const retrieve = async (req: Request, res: Response) => {
     where: { id: user.id },
     relations: {
       beds: true,
-      products: true,
       tasks: true,
     },
   });
@@ -73,8 +72,6 @@ const create = async (
     newUser.username = username;
     newUser.email = email;
     newUser.setPassword(password);
-
-    newUser.products = [];
 
     // Assign all available tasks to each user
     const taskRepo = queryRunner.manager.getRepository(Task);

@@ -1,15 +1,9 @@
 import type { Request, Response } from "express";
 import createHttpError from "http-errors";
 
-import { LessThanOrEqual } from "typeorm";
-
-import {
-  // RetrieveProductsFilterEnum,
-  type RetrieveProductsQuery,
-} from "../../types/routes/products";
+import { type RetrieveProductsQuery } from "../../types/routes/products";
 
 import { AppDataSource } from "../../data-source";
-import { Product } from "../../entities/product";
 import { validatePurchaseBody } from "./validators";
 import { InventoryItem } from "../..//entities/inventory-item";
 
@@ -86,7 +80,7 @@ const purchase = async (req: Request, res: Response) => {
     throw createHttpError(401, "User is not authentificated");
   }
 
-  const { id } = validatePurchaseBody(req.body);
+  // const { id } = validatePurchaseBody(req.body);
 
   // Create a query runner to control the transactions, it allows to cancel the transaction if we need to
   const queryRunner = AppDataSource.createQueryRunner();
@@ -102,36 +96,36 @@ const purchase = async (req: Request, res: Response) => {
       throw createHttpError(401, "User is not authentificated");
     }
 
-    const productRepo = queryRunner.manager.getRepository(Product);
+    // const productRepo = queryRunner.manager.getRepository(Product);
+    //
+    // const product = await productRepo.findOne({
+    //   where: {
+    //     id,
+    //   },
+    // });
+    //
+    // if (!product) {
+    //   createHttpError(404, "Product with given id is not found");
+    // }
+    //
+    // const productAvailableForPurchase = await productRepo.findOneBy({
+    //   id,
+    //   price: LessThanOrEqual(user.ballance),
+    // });
+    //
+    // if (!productAvailableForPurchase) {
+    //   throw createHttpError(400, "Insufficient ballance");
+    // }
+    //
+    // user.ballance -= productAvailableForPurchase.price;
+    //
+    // if (Array.isArray(user.products)) {
+    //   user.products.push(productAvailableForPurchase);
+    // } else {
+    //   user.products = [productAvailableForPurchase];
+    // }
 
-    const product = await productRepo.findOne({
-      where: {
-        id,
-      },
-    });
-
-    if (!product) {
-      createHttpError(404, "Product with given id is not found");
-    }
-
-    const productAvailableForPurchase = await productRepo.findOneBy({
-      id,
-      price: LessThanOrEqual(user.ballance),
-    });
-
-    if (!productAvailableForPurchase) {
-      throw createHttpError(400, "Insufficient ballance");
-    }
-
-    user.ballance -= productAvailableForPurchase.price;
-
-    if (Array.isArray(user.products)) {
-      user.products.push(productAvailableForPurchase);
-    } else {
-      user.products = [productAvailableForPurchase];
-    }
-
-    await queryRunner.manager.save(user);
+    // await queryRunner.manager.save(user);
 
     await queryRunner.commitTransaction();
     // We need to release the query runner to not keep a useless connection to the database
