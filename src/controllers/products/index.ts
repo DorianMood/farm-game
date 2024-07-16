@@ -4,7 +4,6 @@ import createHttpError from "http-errors";
 import { type RetrieveProductsQuery } from "../../types/routes/products";
 
 import { AppDataSource } from "../../data-source";
-import { validatePurchaseBody } from "./validators";
 import { InventoryItem } from "../..//entities/inventory-item";
 
 const retrieve = async (
@@ -27,7 +26,7 @@ const retrieve = async (
     loadEagerRelations: true,
   });
 
-  return res.json(allInventoryItems);
+  return res.json({ items: allInventoryItems });
 
   // switch (filter) {
   //   case RetrieveProductsFilterEnum.available: {
