@@ -16,10 +16,6 @@ const retrieve = async (
     throw createHttpError(401, "User is not authentificated");
   }
 
-  // all, available, mine
-  // const { filter } = req.query;
-
-  // const productsRepository = AppDataSource.getRepository(Product);
   const inventoryItemsRepository = AppDataSource.getRepository(InventoryItem);
 
   const allInventoryItems = await inventoryItemsRepository.find({
@@ -27,51 +23,6 @@ const retrieve = async (
   });
 
   return res.json({ items: allInventoryItems });
-
-  // switch (filter) {
-  //   case RetrieveProductsFilterEnum.available: {
-  //     // Select products available for purchase
-  //     const availableProducts = await productsRepository.find({
-  //       where: {
-  //         price: LessThanOrEqual(user.ballance),
-  //         users: Not(user),
-  //       },
-  //     });
-  //
-  //     // productsRepository.find({
-  //     //   join: {
-  //     //     alias: "users",
-  //     //   },
-  //     //   where: (db) => db.where("users.id = :id", { id: user.id }),
-  //     // });
-  //
-  //     productsRepository
-  //       .createQueryBuilder("product")
-  //       .where("product.price <= :price", { price: user.ballance })
-  //       .andWhere("product.users NOT LIKE :id", { id: user.id });
-  //
-  //     return res.json(availableProducts);
-  //   }
-  //   case RetrieveProductsFilterEnum.mine: {
-  //     // Select purchased products
-  //     // const purchasedProducts = await productsRepository.find({
-  //     //   where: {
-  //     //     users: user,
-  //     //   },
-  //     // });
-  //     break;
-  //   }
-  //   case RetrieveProductsFilterEnum.all: {
-  //     // Select all products
-  //     await productsRepository.find();
-  //     break;
-  //   }
-  //   default: {
-  //     // Select all products
-  //     // await productsRepository.queryRunner
-  //     break;
-  //   }
-  // }
 };
 
 const purchase = async (req: Request, res: Response) => {
