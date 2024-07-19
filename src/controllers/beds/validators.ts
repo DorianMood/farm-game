@@ -1,7 +1,7 @@
 import createHttpError from "http-errors";
 
 import type { BedsHarvestBody, BedsPlantBody } from "../../types/routes/beds";
-import { CropEnum } from "../../common/enums";
+import { SeedEnum } from "../../common/enums";
 
 export const validateHarvestBody = (body: Partial<BedsHarvestBody>) => {
   const { index } = body;
@@ -29,8 +29,11 @@ export const validatePlantBody = (body: Partial<BedsPlantBody>) => {
   if (crop === undefined) {
     throw createHttpError(400, "Crop required");
   }
-  if (!(crop in CropEnum)) {
-    throw createHttpError(400, `Crop must be in enum ${CropEnum}`);
+  if (!(crop in SeedEnum)) {
+    throw createHttpError(
+      400,
+      `Crop must be in enum [${Object.values(SeedEnum)}]`,
+    );
   }
 
   return body as BedsPlantBody;

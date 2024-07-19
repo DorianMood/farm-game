@@ -1,15 +1,12 @@
 import createHttpError from "http-errors";
 import type { Request, Response } from "express";
-import { In, IsNull, LessThan } from "typeorm";
+import { IsNull, LessThan } from "typeorm";
 
 import { AppDataSource } from "../../data-source";
-import { Bed } from "../../entities/bed";
-import { Seed } from "../../entities/seed";
-import { Inventory } from "../../entities/inventory";
-import { InventorySlot } from "../../entities/inventory-slot";
-import { SeedProduct } from "../../entities/seed-product";
-import { SeedEnum } from "../../common/enums";
-import { validateHarvestBody, validatePlantBody } from "./validators";
+import { Barn } from "../../entities/barn";
+import { Animal } from "../../entities/animal";
+import { AnimalEnum } from "../../common/enums";
+import { validateHarvestBody, validateStartBody } from "./validators";
 
 const retrieve = async (req: Request, res: Response) => {
   if (req.isUnauthenticated()) {
@@ -26,16 +23,16 @@ const retrieve = async (req: Request, res: Response) => {
       throw createHttpError(401, "User is not authentificated");
     }
 
-    const bedRepo = queryRunner.manager.getRepository(Bed);
+    const barnRepo = queryRunner.manager.getRepository(Barn);
 
-    const beds = await bedRepo.find({
+    const barns = await barnRepo.find({
       where: {
         user: { id: user.id },
       },
-      relations: ["crop"],
+      relations: ["animal"],
     });
 
-    return res.json(beds);
+    return res.json(barns);
   } catch (err) {
     // As an exception occured, cancel the transaction
     await queryRunner.rollbackTransaction();
@@ -66,106 +63,47 @@ const harvest = async (req: Request, res: Response) => {
       throw createHttpError(401, "User is not authentificated");
     }
 
-    const bedRepo = queryRunner.manager.getRepository(Bed);
-    const seedRepo = queryRunner.manager.getRepository(Seed);
-    const inventoryRepo = queryRunner.manager.getRepository(Inventory);
-    const seedProductRepo = queryRunner.manager.getRepository(SeedProduct);
+    const barnRepo = queryRunner.manager.getRepository(Barn);
 
-    const bed = await bedRepo.findOne({
+    const barn = await barnRepo.findOne({
       where: { index: index, user: { id: user.id } },
-      relations: ["crop"],
+      relations: ["animal"],
     });
 
-    if (!bed) {
-      throw createHttpError(404, "Bed with given index not found");
+    if (!barn) {
+      throw createHttpError(404, "Barn with given index not found");
     }
 
-    const { crop } = bed;
+    const { animal } = barn;
 
-    if (!crop) {
-      throw createHttpError(404, "Crop for bed not found");
+    if (!animal) {
+      throw createHttpError(404, "Animal is not found");
     }
 
-    const bedReady = await bedRepo.exist({
+    const barnReady = await barnRepo.exist({
       where: {
         index: index,
         user: { id: user.id },
-        plantedAt: LessThan(
-          new Date(Date.now() - crop.harvestTimeout).toISOString(),
+        startedAt: LessThan(
+          new Date(Date.now() - animal.harvestTimeout).toISOString(),
         ),
       },
     });
 
-    if (!bedReady) {
-      throw createHttpError(409, "Bed is not ready");
-    }
-
-    const seed = await seedRepo.findOne({
-      where: {
-        type: crop.type,
-      },
-      relations: {
-        inventoryItem: true,
-        seedProducts: true,
-      },
-    });
-
-    if (!seed) {
-      throw createHttpError(409, "No such seed found");
+    if (!barnReady) {
+      throw createHttpError(409, "Barn is not ready");
     }
 
     await queryRunner.manager.update(
-      Bed,
+      Barn,
       { index, user },
-      { plantedAt: null, crop: null },
+      { startedAt: null, animal: null },
     );
 
-    // INFO: add resource to the inventory
-    const inventory = await inventoryRepo.findOne({
-      where: { user: { id: user.id } },
-      relations: {
-        items: {
-          inventoryItem: {
-            seedProduct: true,
-          },
-        },
-      },
-    });
+    // TODO: add resource to inventory
+    user.ballance += animal.inventoryItem.price;
 
-    if (!inventory) {
-      throw createHttpError(409, "No inventory found");
-    }
-
-    const harvestProducts = await seedProductRepo.find({
-      where: {
-        id: In(seed.seedProducts.map((item) => item.id)),
-      },
-      relations: {
-        inventoryItem: true,
-      },
-    });
-
-    for (const product of harvestProducts) {
-      const slotIndex = inventory.items.findIndex(
-        (item) => item.inventoryItem.seedProduct?.type === product.type,
-      );
-
-      if (slotIndex === -1) {
-        // INFO: no inventory slot found, add a new one
-        const inventorySlot = new InventorySlot();
-
-        inventorySlot.amount = 1;
-        inventorySlot.inventoryItem = product.inventoryItem;
-        await queryRunner.manager.save(inventorySlot);
-
-        inventory.items.push(inventorySlot);
-      } else {
-        // INFO: otherwise increment slot amount value
-        inventory.items[slotIndex].amount += 1;
-      }
-    }
-
-    await queryRunner.manager.save(inventory);
+    await queryRunner.manager.save(user);
 
     await queryRunner.commitTransaction();
     // We need to release the query runner to not keep a useless connection to the database
@@ -189,7 +127,7 @@ const plant = async (req: Request, res: Response) => {
     throw createHttpError(401, "User is not authentificated");
   }
 
-  const { index, crop } = validatePlantBody(req.body);
+  const { index, animal } = validateStartBody(req.body);
 
   // Create a query runner to control the transactions, it allows to cancel the transaction if we need to
   const queryRunner = AppDataSource.createQueryRunner();
@@ -205,44 +143,37 @@ const plant = async (req: Request, res: Response) => {
       throw createHttpError(401, "User is not authentificated");
     }
 
-    const bedRepo = queryRunner.manager.getRepository(Bed);
-    const seedRepo = queryRunner.manager.getRepository(Seed);
+    const barnRepo = queryRunner.manager.getRepository(Barn);
+    const animalRepo = queryRunner.manager.getRepository(Animal);
 
-    const bedExists = await bedRepo.exist({
+    const barnExists = await barnRepo.exist({
       where: { index: index, user: { id: user.id } },
     });
 
-    if (!bedExists) {
-      throw createHttpError(404, "Bed with given index not found");
+    if (!barnExists) {
+      throw createHttpError(404, "Barn with given index not found");
     }
 
-    const bedReady = await bedRepo.exist({
+    const barnReady = await barnRepo.exist({
       where: {
         index: index,
         user: { id: user.id },
-        crop: IsNull(),
+        animal: IsNull(),
       },
     });
 
-    if (!bedReady) {
-      throw createHttpError(409, "Bed is not empty");
+    if (!barnReady) {
+      throw createHttpError(409, "Barn is not empty");
     }
 
-    const seed = await seedRepo.findOne({
-      where: {
-        type: SeedEnum[crop],
-      },
-      relations: ["inventoryItem"],
+    const pet = await animalRepo.findOneBy({
+      type: AnimalEnum[animal],
     });
-
-    if (!seed) {
-      throw createHttpError(409, "No such seed found");
-    }
 
     await queryRunner.manager.update(
-      Bed,
+      Barn,
       { index, user },
-      { plantedAt: new Date().toISOString(), crop: seed },
+      { startedAt: new Date().toISOString(), animal: pet },
     );
 
     await queryRunner.manager.save(user);

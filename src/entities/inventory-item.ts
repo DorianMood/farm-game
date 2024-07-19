@@ -20,7 +20,7 @@ export class InventoryItem extends IdDates {
   @Column({ nullable: false })
   price!: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, type: "float", default: 1 })
   sellMultiplier!: number;
 
   @Column({

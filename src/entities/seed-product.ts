@@ -1,8 +1,9 @@
-import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from "typeorm";
 
 import { SeedProductEnum } from "../common/enums";
 import { Id } from "./helpers";
 import { InventoryItem } from "./inventory-item";
+import { Seed } from "./seed";
 
 @Entity()
 export class SeedProduct extends Id {
@@ -18,4 +19,8 @@ export class SeedProduct extends Id {
     unique: true,
   })
   type!: SeedProductEnum;
+
+  @ManyToOne(() => Seed, (seed) => seed.seedProducts, { cascade: true })
+  @JoinColumn()
+  seed!: Seed;
 }

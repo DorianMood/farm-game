@@ -1,30 +1,42 @@
 import createHttpError from "http-errors";
 import type { Request, Response } from "express";
-// import { IsNull, LessThan } from "typeorm";
 
 import { AppDataSource } from "../../data-source";
-// import { Animal } from "../../entities/animal";
-// import {
-//   BED_GROWING_TIMEOUT,
-//   BED_PLANT_REWARD,
-//   BED_HARVEST_REWARD,
-// } from "../../common/constants";
-// import { CropEnum } from "../../common/enums";
-// import { validateHarvestBody, validateStartBody } from "./validators";
+import { User } from "../../entities/user";
+import { Inventory } from "../../entities/inventory";
 
-const retrieve = (req: Request, res: Response) => {
+const retrieve = async (req: Request, res: Response) => {
   if (req.isUnauthenticated()) {
     throw createHttpError(401, "User is not authentificated");
   }
 
-  // const bedsQueryBuilder =
-  //   AppDataSource.getRepository(Animal).createQueryBuilder("animal");
-  //
-  // const beds = await bedsQueryBuilder
-  //   .where("bed.user = :userId", { userId: req.user?.id })
-  //   .getMany();
+  const user = req.user;
 
-  return res.json([]);
+  if (!user) {
+    throw createHttpError(401, "User is not authentificated");
+  }
+
+  const queryRunner = AppDataSource.createQueryRunner();
+
+  const userWithInventory = await queryRunner.manager.findOne(User, {
+    where: { id: user.id },
+    relations: {
+      inventory: true,
+    },
+  });
+
+  const inventory = await queryRunner.manager.findOne(Inventory, {
+    where: { id: userWithInventory!.inventory.id },
+    relations: {
+      items: {
+        inventoryItem: true,
+      },
+    },
+  });
+
+  const animals = inventory?.items.filter((item) => item.inventoryItem.animal);
+
+  return res.json(animals);
 };
 
 const harvest = async (req: Request, res: Response) => {

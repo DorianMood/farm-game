@@ -2,25 +2,25 @@ import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 
 import { User } from "./user";
 import { Id } from "./helpers";
-import { Seed } from "./seed";
+import { Animal } from "./animal";
 
 @Entity()
-export class Bed extends Id {
+export class Barn extends Id {
   @Column({ nullable: false })
   index!: number;
 
-  @ManyToOne(() => User, (user) => user.beds, {
+  @ManyToOne(() => User, (user) => user.barns, {
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
   })
   user!: User;
 
   @Column({ type: "timestamptz", nullable: true })
-  plantedAt!: string | null;
+  startedAt!: string | null;
 
-  @ManyToOne(() => Seed, (seed) => seed.id, {
+  @ManyToOne(() => Animal, (animal) => animal.id, {
     nullable: true,
   })
   @JoinColumn()
-  crop!: Seed | null;
+  animal!: Animal | null;
 }

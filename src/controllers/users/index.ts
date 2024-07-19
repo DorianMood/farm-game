@@ -8,6 +8,7 @@ import { Bed } from "../../entities/bed";
 import { Task } from "../../entities/task";
 import { UserTask } from "../../entities/user-task";
 import { Inventory } from "../../entities/inventory";
+import { Barn } from "../../entities/barn";
 
 import type { UsersCreateBody } from "../../types/routes/users";
 import { validateCreateBody } from "./validators";
@@ -101,6 +102,18 @@ const create = async (
       newBeds.push(newBed);
     }
     newUser.beds = newBeds;
+
+    // Create 4 barns for each user
+    const newBarns: Barn[] = [];
+    for (let i = 0; i < 4; i++) {
+      const newBarn = new Barn();
+      newBarn.index = i;
+
+      await queryRunner.manager.save(newBarn);
+
+      newBarns.push(newBarn);
+    }
+    newUser.barns = newBarns;
 
     // Create an inventory for new user
     const newInventory = new Inventory();

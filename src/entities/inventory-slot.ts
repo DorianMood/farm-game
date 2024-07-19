@@ -18,6 +18,7 @@ export class InventorySlot extends Id {
   @ManyToOne(() => InventoryItem, {
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
+    cascade: ["insert", "update"],
   })
   @JoinColumn()
   inventoryItem!: InventoryItem;

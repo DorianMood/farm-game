@@ -17,4 +17,3 @@ export const validateLoginBody = (body: Partial<AuthLoginBody>) => {
   // return the body as original type
   return body as AuthLoginBody;
 };
-

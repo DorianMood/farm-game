@@ -5,6 +5,7 @@ import { Bed } from "./bed";
 import { UserTask } from "./user-task";
 import { Inventory } from "./inventory";
 import { IdDates } from "./helpers";
+import { Barn } from "./barn";
 
 @Entity()
 export class User extends IdDates {
@@ -24,6 +25,11 @@ export class User extends IdDates {
     cascade: true,
   })
   beds!: Bed[];
+
+  @OneToMany(() => Barn, (barn) => barn.user, {
+    cascade: true,
+  })
+  barns!: Barn[];
 
   @Column({ nullable: false, default: 0 })
   ballance!: number;

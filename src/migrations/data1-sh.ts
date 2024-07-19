@@ -21,255 +21,270 @@ import { AnimalProduct } from "../entities/animal-product";
 
 // INFO: this migration creates all possible animal, plants and seeds
 
+const SECOND = 1000;
+const MINUTE = 60 * SECOND;
+const HOUR = 60 * MINUTE;
+
+const DEFAULT_SELL_MULTIPLIER = 0.8;
+
+const data = {
+  // WARNING: order metters
+  animals: [
+    {
+      harvestTimeout: 6 * HOUR,
+      type: AnimalEnum.HenAnimal,
+      name: "Курица",
+      description:
+        "В зависимости от породы, куры имеют различный вес, примерно 0,8 – 5 кг, а также различаются по окраске пера, цвету яиц, размеру и некоторым внешним признакам (характерным для декоративных пород). Петухи обычно крупнее самок, у них более яркое оперение и длинный хвост. С возрастом на ногах у петуха образуются шпоры – костные выросты. Куры и петухи имеют бородку и гребень, которые выполняют функцию терморегулятора и обеспечивают нормальный приток крови к коже. Гребень петуха гораздо больше, чем у кур, у цыплят он малозаметен. Формы гребня могут быть листовидными с зубцами по краю, стручковидными и др. Несмотря на то, что у кур есть крылья, они неспособны к длительному и высокому полету.",
+      price: 100,
+      sellMultiplier: DEFAULT_SELL_MULTIPLIER,
+    },
+    {
+      harvestTimeout: 12 * HOUR,
+      type: AnimalEnum.SheepAnimal,
+      name: "Овца",
+      description:
+        "Современная овца очень давно одомашнена человеком, который нуждался в шерсти и съедобном мясе. Это животное — млекопитающее, оно относится к роду баранов из обширного семейства полорогих. Овечья шерсть и сейчас имеет самое широкое применение. Мясо овец, называемое бараниной, пользуется спросом и является основным мясным продуктом в мусульманских странах. В узком значении овца — это самка животного, самцов называют баранами. Овцеводство, как отрасль животноводства в сельском хозяйстве, играет огромную роль во многих мировых экономиках.",
+      price: 200,
+      sellMultiplier: DEFAULT_SELL_MULTIPLIER,
+    },
+    {
+      harvestTimeout: 18 * HOUR,
+      type: AnimalEnum.CowAnimal,
+      name: "Корова",
+      description:
+        "Особая ценность молочной коровы как сельскохозяйственного животного зависит от ее способности потреблять и переваривать большое количество грубых кормов и превращать их в молоко и мясо, особенно хорошо усвояемые человеком.",
+      price: 300,
+      sellMultiplier: DEFAULT_SELL_MULTIPLIER,
+    },
+    {
+      harvestTimeout: 24 * HOUR,
+      type: AnimalEnum.PigAnimal,
+      name: "Свинья",
+      description:
+        "По сравнению с другими парнокопытными, которые чаще бывают растительноядными, домашняя свинья всеядна, как и её предок, дикий кабан. Свиньи выращиваются в основном ради мяса и сала. Мировое производство свинины в 2005 году составило 97,2 млн т",
+      price: 400,
+      sellMultiplier: DEFAULT_SELL_MULTIPLIER,
+    },
+  ],
+  // WARNING: order metters
+  animalProducts: [
+    {
+      type: AnimalProductEnum.Hen,
+      name: "Курица",
+      description:
+        "В зависимости от породы, куры имеют различный вес, примерно 0,8 – 5 кг, а также различаются по окраске пера, цвету яиц, размеру и некоторым внешним признакам (характерным для декоративных пород). Петухи обычно крупнее самок, у них более яркое оперение и длинный хвост. С возрастом на ногах у петуха образуются шпоры – костные выросты. Куры и петухи имеют бородку и гребень, которые выполняют функцию терморегулятора и обеспечивают нормальный приток крови к коже. Гребень петуха гораздо больше, чем у кур, у цыплят он малозаметен. Формы гребня могут быть листовидными с зубцами по краю, стручковидными и др. Несмотря на то, что у кур есть крылья, они неспособны к длительному и высокому полету.",
+      price: 10,
+      sellMultiplier: DEFAULT_SELL_MULTIPLIER,
+    },
+    {
+      type: AnimalProductEnum.Sheep,
+      name: "Овца",
+      description:
+        "Современная овца очень давно одомашнена человеком, который нуждался в шерсти и съедобном мясе. Это животное — млекопитающее, оно относится к роду баранов из обширного семейства полорогих. Овечья шерсть и сейчас имеет самое широкое применение. Мясо овец, называемое бараниной, пользуется спросом и является основным мясным продуктом в мусульманских странах. В узком значении овца — это самка животного, самцов называют баранами. Овцеводство, как отрасль животноводства в сельском хозяйстве, играет огромную роль во многих мировых экономиках.",
+      price: 20,
+      sellMultiplier: DEFAULT_SELL_MULTIPLIER,
+    },
+    {
+      type: AnimalProductEnum.Cow,
+      name: "Корова",
+      description:
+        "Особая ценность молочной коровы как сельскохозяйственного животного зависит от ее способности потреблять и переваривать большое количество грубых кормов и превращать их в молоко и мясо, особенно хорошо усвояемые человеком.",
+      price: 30,
+      sellMultiplier: DEFAULT_SELL_MULTIPLIER,
+    },
+    {
+      type: AnimalProductEnum.Pig,
+      name: "Свинья",
+      description:
+        "По сравнению с другими парнокопытными, которые чаще бывают растительноядными, домашняя свинья всеядна, как и её предок, дикий кабан. Свиньи выращиваются в основном ради мяса и сала. Мировое производство свинины в 2005 году составило 97,2 млн т",
+      price: 40,
+      sellMultiplier: DEFAULT_SELL_MULTIPLIER,
+    },
+  ],
+  // WARNING: order metters
+  seeds: [
+    {
+      harvestTimeout: 5 * MINUTE,
+      type: SeedEnum.CarrotSeed,
+      name: "Морковь",
+      description:
+        "Обычно в быту под словом «морковь» подразумевается широко распространённый корнеплод именно этого растения, который обычно относят к овощам.",
+      price: 10,
+      sellMultiplier: DEFAULT_SELL_MULTIPLIER,
+    },
+    {
+      harvestTimeout: 10 * MINUTE,
+      type: SeedEnum.BeetSeed,
+      name: "Свекла",
+      description:
+        "Сахарная свекла в Российской Федерации является основным источником получения одного из ценнейших продуктов питания – сахара. Доля свекловичного сахара в общем объеме производства составляет 65,5%. В процессе переработки сахарной свеклы, помимо сахара, получают мелассу и жом. В промышленности мелассу используют для производства органических кислот, дрожжей и спирта. В сельском хозяйстве она является ценной кормовой добавкой животным.",
+      price: 20,
+      sellMultiplier: DEFAULT_SELL_MULTIPLIER,
+    },
+    {
+      harvestTimeout: 15 * MINUTE,
+      type: SeedEnum.PotatoSeed,
+      name: "Картофель",
+      description:
+        "Клубни картофеля являются важным пищевым продуктом. Плоды ядовиты в связи с содержанием в них соланина. С потребительской точки зрения картофель является овощем.",
+      price: 30,
+      sellMultiplier: DEFAULT_SELL_MULTIPLIER,
+    },
+    {
+      harvestTimeout: 20 * MINUTE,
+      type: SeedEnum.WheatSeed,
+      name: "Пшеница",
+      description:
+        "Получаемая из зёрен пшеницы мука используется при выпекании хлеба, изготовлении макаронных и кондитерских изделий. Пшеница также используется как кормовая культура, входит в некоторые рецепты приготовления пива и водки, а также виски.",
+      price: 40,
+      sellMultiplier: DEFAULT_SELL_MULTIPLIER,
+    },
+    {
+      harvestTimeout: 25 * MINUTE,
+      type: SeedEnum.FlowerSeed,
+      name: "Цветы",
+      description:
+        "Растения выращивают для украшения парков, скверов, садов, различных помещений, для получения цветов на срезку. Одни растения выращивают в открытом грунте, другие — в теплицах, оранжереях, комнатах. Заниматься цветоводством люди начали в глубокой древности.",
+      price: 50,
+      sellMultiplier: DEFAULT_SELL_MULTIPLIER,
+    },
+  ],
+  // WARNING: order metters
+  seedProducts: [
+    {
+      type: SeedProductEnum.Carrot,
+      name: "Морковь",
+      description:
+        "Обычно в быту под словом «морковь» подразумевается широко распространённый корнеплод именно этого растения, который обычно относят к овощам.",
+      price: 12,
+      sellMultiplier: 1,
+    },
+    {
+      type: SeedProductEnum.Beet,
+      name: "Свекла",
+      description:
+        "Сахарная свекла в Российской Федерации является основным источником получения одного из ценнейших продуктов питания – сахара. Доля свекловичного сахара в общем объеме производства составляет 65,5%. В процессе переработки сахарной свеклы, помимо сахара, получают мелассу и жом. В промышленности мелассу используют для производства органических кислот, дрожжей и спирта. В сельском хозяйстве она является ценной кормовой добавкой животным.",
+      price: 24,
+      sellMultiplier: 1,
+    },
+    {
+      type: SeedProductEnum.Potato,
+      name: "Картофель",
+      description:
+        "Клубни картофеля являются важным пищевым продуктом. Плоды ядовиты в связи с содержанием в них соланина. С потребительской точки зрения картофель является овощем.",
+      price: 36,
+      sellMultiplier: 1,
+    },
+    {
+      type: SeedProductEnum.Wheat,
+      name: "Пшеница",
+      description:
+        "Получаемая из зёрен пшеницы мука используется при выпекании хлеба, изготовлении макаронных и кондитерских изделий. Пшеница также используется как кормовая культура, входит в некоторые рецепты приготовления пива и водки, а также виски.",
+      price: 48,
+      sellMultiplier: 1,
+    },
+    {
+      type: SeedProductEnum.Flower,
+      name: "Цветы",
+      description:
+        "Растения выращивают для украшения парков, скверов, садов, различных помещений, для получения цветов на срезку. Одни растения выращивают в открытом грунте, другие — в теплицах, оранжереях, комнатах. Заниматься цветоводством люди начали в глубокой древности.",
+      price: 60,
+      sellMultiplier: 1,
+    },
+  ],
+};
+
 export class Sh2000000000001 implements MigrationInterface {
   name = "Sh2000000000001";
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+    const inventoryItemRepo = queryRunner.manager.getRepository(InventoryItem);
+
     // Animals
     const animals: InventoryItem[] = [];
 
-    const cow = new Animal();
-    cow.harvestTimeout = 24 * 60 * 60 * 1000;
-    cow.type = AnimalEnum.CowAnimal;
-    const farmProduct = new InventoryItem();
-    farmProduct.name = "Корова";
-    farmProduct.description =
-      "Особая ценность молочной коровы как сельскохозяйственного животного зависит от ее способности потреблять и переваривать большое количество грубых кормов и превращать их в молоко и мясо, особенно хорошо усвояемые человеком.";
-    farmProduct.price = 100;
-    farmProduct.animal = cow;
-    farmProduct.sellMultiplier = 1;
-    farmProduct.category = InventoryItemCategoryEnum.Animal;
-    animals.push(farmProduct);
+    for (const item of data.animals) {
+      const animal = new Animal();
+      animal.harvestTimeout = item.harvestTimeout;
+      animal.type = item.type;
 
-    const sheep = new Animal();
-    sheep.harvestTimeout = 24 * 60 * 60 * 1000;
-    sheep.type = AnimalEnum.SheepAnimal;
-    const farmProductSheep = new InventoryItem();
-    farmProductSheep.name = "Овца";
-    farmProductSheep.description =
-      "Современная овца очень давно одомашнена человеком, который нуждался в шерсти и съедобном мясе. Это животное — млекопитающее, оно относится к роду баранов из обширного семейства полорогих. Овечья шерсть и сейчас имеет самое широкое применение. Мясо овец, называемое бараниной, пользуется спросом и является основным мясным продуктом в мусульманских странах. В узком значении овца — это самка животного, самцов называют баранами. Овцеводство, как отрасль животноводства в сельском хозяйстве, играет огромную роль во многих мировых экономиках.";
-    farmProductSheep.price = 100;
-    farmProductSheep.animal = sheep;
-    farmProductSheep.sellMultiplier = 1;
-    farmProductSheep.category = InventoryItemCategoryEnum.Animal;
-    animals.push(farmProductSheep);
+      const inventoryItem = new InventoryItem();
+      inventoryItem.animal = animal;
+      inventoryItem.name = item.name;
+      inventoryItem.description = item.description;
+      inventoryItem.price = item.price;
+      inventoryItem.sellMultiplier = item.sellMultiplier;
+      inventoryItem.category = InventoryItemCategoryEnum.Animal;
+      animals.push(inventoryItem);
+    }
 
-    const hen = new Animal();
-    hen.harvestTimeout = 24 * 60 * 60 * 1000;
-    hen.type = AnimalEnum.HenAnimal;
-    const farmProductHen = new InventoryItem();
-    farmProductHen.name = "Курица";
-    farmProductHen.description =
-      "В зависимости от породы, куры имеют различный вес, примерно 0,8 – 5 кг, а также различаются по окраске пера, цвету яиц, размеру и некоторым внешним признакам (характерным для декоративных пород). Петухи обычно крупнее самок, у них более яркое оперение и длинный хвост. С возрастом на ногах у петуха образуются шпоры – костные выросты. Куры и петухи имеют бородку и гребень, которые выполняют функцию терморегулятора и обеспечивают нормальный приток крови к коже. Гребень петуха гораздо больше, чем у кур, у цыплят он малозаметен. Формы гребня могут быть листовидными с зубцами по краю, стручковидными и др. Несмотря на то, что у кур есть крылья, они неспособны к длительному и высокому полету.";
-    farmProductHen.price = 100;
-    farmProductHen.animal = hen;
-    farmProductHen.sellMultiplier = 1;
-    farmProductHen.category = InventoryItemCategoryEnum.Animal;
-    animals.push(farmProductHen);
+    await inventoryItemRepo.save(animals);
 
-    const pig = new Animal();
-    pig.harvestTimeout = 24 * 60 * 60 * 1000;
-    pig.type = AnimalEnum.PigAnimal;
-    const farmProductPig = new InventoryItem();
-    farmProductPig.name = "Свинья";
-    farmProductPig.description =
-      "По сравнению с другими парнокопытными, которые чаще бывают растительноядными, домашняя свинья всеядна, как и её предок, дикий кабан. Свиньи выращиваются в основном ради мяса и сала. Мировое производство свинины в 2005 году составило 97,2 млн т";
-    farmProductPig.price = 100;
-    farmProductPig.animal = pig;
-    farmProductPig.sellMultiplier = 1;
-    farmProductPig.category = InventoryItemCategoryEnum.Animal;
-    animals.push(farmProductPig);
-
-    // Animals
+    // Animal products
     const animalProducts: InventoryItem[] = [];
 
-    const cowProduct = new AnimalProduct();
-    cowProduct.type = AnimalProductEnum.Cow;
-    const farmProductCowProduct = new InventoryItem();
-    farmProductCowProduct.name = "Корова";
-    farmProductCowProduct.description =
-      "Особая ценность молочной коровы как сельскохозяйственного животного зависит от ее способности потреблять и переваривать большое количество грубых кормов и превращать их в молоко и мясо, особенно хорошо усвояемые человеком.";
-    farmProductCowProduct.price = 100;
-    farmProductCowProduct.animalProduct = cowProduct;
-    farmProductCowProduct.sellMultiplier = 1;
-    farmProductCowProduct.category = InventoryItemCategoryEnum.AnimalProduct;
-    animalProducts.push(farmProductCowProduct);
+    for (let i = 0; i < data.animalProducts.length; i++) {
+      const animal = animals[i];
+      const item = data.animalProducts[i];
 
-    const sheepProduct = new AnimalProduct();
-    sheepProduct.type = AnimalProductEnum.Sheep;
-    const farmProductSheepProduct = new InventoryItem();
-    farmProductSheepProduct.name = "Овца";
-    farmProductSheepProduct.description =
-      "Современная овца очень давно одомашнена человеком, который нуждался в шерсти и съедобном мясе. Это животное — млекопитающее, оно относится к роду баранов из обширного семейства полорогих. Овечья шерсть и сейчас имеет самое широкое применение. Мясо овец, называемое бараниной, пользуется спросом и является основным мясным продуктом в мусульманских странах. В узком значении овца — это самка животного, самцов называют баранами. Овцеводство, как отрасль животноводства в сельском хозяйстве, играет огромную роль во многих мировых экономиках.";
-    farmProductSheepProduct.price = 100;
-    farmProductSheepProduct.animalProduct = sheepProduct;
-    farmProductSheepProduct.sellMultiplier = 1;
-    farmProductSheepProduct.category = InventoryItemCategoryEnum.AnimalProduct;
-    animalProducts.push(farmProductSheepProduct);
+      const animalProduct = new AnimalProduct();
+      animalProduct.type = item.type;
+      animalProduct.animal = animal.animal!;
 
-    const henProduct = new AnimalProduct();
-    henProduct.type = AnimalProductEnum.Hen;
-    const farmProductHenProduct = new InventoryItem();
-    farmProductHenProduct.name = "Курица";
-    farmProductHenProduct.description =
-      "В зависимости от породы, куры имеют различный вес, примерно 0,8 – 5 кг, а также различаются по окраске пера, цвету яиц, размеру и некоторым внешним признакам (характерным для декоративных пород). Петухи обычно крупнее самок, у них более яркое оперение и длинный хвост. С возрастом на ногах у петуха образуются шпоры – костные выросты. Куры и петухи имеют бородку и гребень, которые выполняют функцию терморегулятора и обеспечивают нормальный приток крови к коже. Гребень петуха гораздо больше, чем у кур, у цыплят он малозаметен. Формы гребня могут быть листовидными с зубцами по краю, стручковидными и др. Несмотря на то, что у кур есть крылья, они неспособны к длительному и высокому полету.";
-    farmProductHenProduct.price = 100;
-    farmProductHenProduct.animalProduct = henProduct;
-    farmProductHenProduct.sellMultiplier = 1;
-    farmProductHenProduct.category = InventoryItemCategoryEnum.AnimalProduct;
-    animalProducts.push(farmProductHenProduct);
+      const inventoryItem = new InventoryItem();
+      inventoryItem.name = item.name;
+      inventoryItem.description = item.description;
+      inventoryItem.price = item.price;
+      inventoryItem.animalProduct = animalProduct;
+      inventoryItem.sellMultiplier = item.sellMultiplier;
+      inventoryItem.category = InventoryItemCategoryEnum.AnimalProduct;
+      animalProducts.push(inventoryItem);
+    }
 
-    const pigProduct = new AnimalProduct();
-    pigProduct.type = AnimalProductEnum.Pig;
-    const farmProductPigProduct = new InventoryItem();
-    farmProductPigProduct.name = "Свинья";
-    farmProductPigProduct.description =
-      "По сравнению с другими парнокопытными, которые чаще бывают растительноядными, домашняя свинья всеядна, как и её предок, дикий кабан. Свиньи выращиваются в основном ради мяса и сала. Мировое производство свинины в 2005 году составило 97,2 млн т";
-    farmProductPigProduct.price = 100;
-    farmProductPigProduct.animalProduct = pigProduct;
-    farmProductPigProduct.sellMultiplier = 1;
-    farmProductPigProduct.category = InventoryItemCategoryEnum.AnimalProduct;
-    animalProducts.push(farmProductPigProduct);
-
-    // Plants
-    const seedProducts: InventoryItem[] = [];
-
-    const carrot = new SeedProduct();
-    carrot.type = SeedProductEnum.Carrot;
-    const farmProductCarrot = new InventoryItem();
-    farmProductCarrot.name = "Морковь";
-    farmProductCarrot.description =
-      "Обычно в быту под словом «морковь» подразумевается широко распространённый корнеплод именно этого растения, который обычно относят к овощам.";
-    farmProductCarrot.price = 100;
-    farmProductCarrot.seedProduct = carrot;
-    farmProductCarrot.sellMultiplier = 1;
-    farmProductCarrot.category = InventoryItemCategoryEnum.SeedProduct;
-    seedProducts.push(farmProductCarrot);
-
-    const beet = new SeedProduct();
-    beet.type = SeedProductEnum.Beet;
-    const farmProductBeet = new InventoryItem();
-    farmProductBeet.name = "Свекла";
-    farmProductBeet.description =
-      "Сахарная свекла в Российской Федерации является основным источником получения одного из ценнейших продуктов питания – сахара. Доля свекловичного сахара в общем объеме производства составляет 65,5%. В процессе переработки сахарной свеклы, помимо сахара, получают мелассу и жом. В промышленности мелассу используют для производства органических кислот, дрожжей и спирта. В сельском хозяйстве она является ценной кормовой добавкой животным.";
-    farmProductBeet.price = 100;
-    farmProductBeet.seedProduct = beet;
-    farmProductBeet.sellMultiplier = 1;
-    farmProductBeet.category = InventoryItemCategoryEnum.SeedProduct;
-    seedProducts.push(farmProductBeet);
-
-    const potato = new SeedProduct();
-    potato.type = SeedProductEnum.Potato;
-    const farmProductPotato = new InventoryItem();
-    farmProductPotato.name = "Картофель";
-    farmProductPotato.description =
-      "Клубни картофеля являются важным пищевым продуктом. Плоды ядовиты в связи с содержанием в них соланина. С потребительской точки зрения картофель является овощем.";
-    farmProductPotato.price = 100;
-    farmProductPotato.seedProduct = potato;
-    farmProductPotato.sellMultiplier = 1;
-    farmProductPotato.category = InventoryItemCategoryEnum.SeedProduct;
-    seedProducts.push(farmProductPotato);
-
-    const wheat = new SeedProduct();
-    wheat.type = SeedProductEnum.Wheat;
-    const farmProductWheat = new InventoryItem();
-    farmProductWheat.name = "Пшеница";
-    farmProductWheat.description =
-      "Получаемая из зёрен пшеницы мука используется при выпекании хлеба, изготовлении макаронных и кондитерских изделий. Пшеница также используется как кормовая культура, входит в некоторые рецепты приготовления пива и водки, а также виски.";
-    farmProductWheat.price = 100;
-    farmProductWheat.seedProduct = wheat;
-    farmProductWheat.sellMultiplier = 1;
-    farmProductWheat.category = InventoryItemCategoryEnum.SeedProduct;
-    seedProducts.push(farmProductWheat);
-
-    const flower = new SeedProduct();
-    flower.type = SeedProductEnum.Flower;
-    const farmProductFlower = new InventoryItem();
-    farmProductFlower.name = "Цветы";
-    farmProductFlower.description =
-      "Растения выращивают для украшения парков, скверов, садов, различных помещений, для получения цветов на срезку. Одни растения выращивают в открытом грунте, другие — в теплицах, оранжереях, комнатах. Заниматься цветоводством люди начали в глубокой древности.";
-    farmProductFlower.price = 100;
-    farmProductFlower.seedProduct = flower;
-    farmProductFlower.sellMultiplier = 1;
-    farmProductFlower.category = InventoryItemCategoryEnum.SeedProduct;
-    seedProducts.push(farmProductFlower);
+    await inventoryItemRepo.save(animalProducts);
 
     // Seeds
     const seeds: InventoryItem[] = [];
 
-    const carrotSeed = new Seed();
-    carrotSeed.harvestTimeout = 5 * 60 * 1000;
-    carrotSeed.type = SeedEnum.CarrotSeed;
-    const farmProductCarrotSeed = new InventoryItem();
-    farmProductCarrotSeed.name = "Морковь";
-    farmProductCarrotSeed.description =
-      "Обычно в быту под словом «морковь» подразумевается широко распространённый корнеплод именно этого растения, который обычно относят к овощам.";
-    farmProductCarrotSeed.price = 100;
-    farmProductCarrotSeed.seed = carrotSeed;
-    farmProductCarrotSeed.sellMultiplier = 1;
-    farmProductCarrotSeed.category = InventoryItemCategoryEnum.Seed;
-    seeds.push(farmProductCarrotSeed);
+    for (const item of data.seeds) {
+      const seed = new Seed();
+      seed.harvestTimeout = item.harvestTimeout;
+      seed.type = item.type;
+      const inventoryItem = new InventoryItem();
+      inventoryItem.name = item.name;
+      inventoryItem.description = item.description;
+      inventoryItem.price = item.price;
+      inventoryItem.seed = seed;
+      inventoryItem.sellMultiplier = item.sellMultiplier;
+      inventoryItem.category = InventoryItemCategoryEnum.Seed;
+      seeds.push(inventoryItem);
+    }
 
-    const beetSeed = new Seed();
-    beetSeed.harvestTimeout = 10 * 60 * 1000;
-    beetSeed.type = SeedEnum.BeetSeed;
-    const farmProductBeetSeed = new InventoryItem();
-    farmProductBeetSeed.name = "Свекла";
-    farmProductBeetSeed.description =
-      "Сахарная свекла в Российской Федерации является основным источником получения одного из ценнейших продуктов питания – сахара. Доля свекловичного сахара в общем объеме производства составляет 65,5%. В процессе переработки сахарной свеклы, помимо сахара, получают мелассу и жом. В промышленности мелассу используют для производства органических кислот, дрожжей и спирта. В сельском хозяйстве она является ценной кормовой добавкой животным.";
-    farmProductBeetSeed.price = 100;
-    farmProductBeetSeed.seed = beetSeed;
-    farmProductBeetSeed.sellMultiplier = 1;
-    farmProductBeetSeed.category = InventoryItemCategoryEnum.Seed;
-    seeds.push(farmProductBeetSeed);
-
-    const potatoSeed = new Seed();
-    potatoSeed.harvestTimeout = 15 * 60 * 1000;
-    potatoSeed.type = SeedEnum.PotatoSeed;
-    const farmProductPotatoSeed = new InventoryItem();
-    farmProductPotatoSeed.name = "Картофель";
-    farmProductPotatoSeed.description =
-      "Клубни картофеля являются важным пищевым продуктом. Плоды ядовиты в связи с содержанием в них соланина. С потребительской точки зрения картофель является овощем.";
-    farmProductPotatoSeed.price = 100;
-    farmProductPotatoSeed.seed = potatoSeed;
-    farmProductPotatoSeed.sellMultiplier = 1;
-    farmProductPotatoSeed.category = InventoryItemCategoryEnum.Seed;
-    seeds.push(farmProductPotatoSeed);
-
-    const wheatSeed = new Seed();
-    wheatSeed.harvestTimeout = 20 * 60 * 1000;
-    wheatSeed.type = SeedEnum.WheatSeed;
-    const farmProductWheatSeed = new InventoryItem();
-    farmProductWheatSeed.name = "Пшеница";
-    farmProductWheatSeed.description =
-      "Получаемая из зёрен пшеницы мука используется при выпекании хлеба, изготовлении макаронных и кондитерских изделий. Пшеница также используется как кормовая культура, входит в некоторые рецепты приготовления пива и водки, а также виски.";
-    farmProductWheatSeed.price = 100;
-    farmProductWheatSeed.seed = wheatSeed;
-    farmProductWheatSeed.sellMultiplier = 1;
-    farmProductWheatSeed.category = InventoryItemCategoryEnum.Seed;
-    seeds.push(farmProductWheatSeed);
-
-    const flowerSeed = new Seed();
-    flowerSeed.harvestTimeout = 25 * 60 * 1000;
-    flowerSeed.type = SeedEnum.FlowerSeed;
-    const farmProductFlowerSeed = new InventoryItem();
-    farmProductFlowerSeed.name = "Цветы";
-    farmProductFlowerSeed.description =
-      "Растения выращивают для украшения парков, скверов, садов, различных помещений, для получения цветов на срезку. Одни растения выращивают в открытом грунте, другие — в теплицах, оранжереях, комнатах. Заниматься цветоводством люди начали в глубокой древности.";
-    farmProductFlowerSeed.price = 100;
-    farmProductFlowerSeed.seed = flowerSeed;
-    farmProductFlowerSeed.sellMultiplier = 1;
-    farmProductFlowerSeed.category = InventoryItemCategoryEnum.Seed;
-    seeds.push(farmProductFlowerSeed);
-
-    // Save data
-
-    const inventoryItemRepo = queryRunner.manager.getRepository(InventoryItem);
-
-    await inventoryItemRepo.save(animals);
-    await inventoryItemRepo.save(animalProducts);
-    await inventoryItemRepo.save(seedProducts);
     await inventoryItemRepo.save(seeds);
+
+    // Seed products
+    const seedProducts: InventoryItem[] = [];
+
+    for (let i = 0; i < data.seedProducts.length; i++) {
+      const seed = seeds[i];
+      const item = data.seedProducts[i];
+
+      const seedProduct = new SeedProduct();
+      seedProduct.type = item.type;
+      seedProduct.seed = seed.seed!;
+
+      const inventoryItem = new InventoryItem();
+      inventoryItem.name = item.name;
+      inventoryItem.description = item.description;
+      inventoryItem.price = item.price;
+      inventoryItem.seedProduct = seedProduct;
+      inventoryItem.sellMultiplier = item.sellMultiplier;
+      inventoryItem.category = InventoryItemCategoryEnum.SeedProduct;
+      seedProducts.push(inventoryItem);
+    }
+
+    await inventoryItemRepo.save(seedProducts);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
