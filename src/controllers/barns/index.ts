@@ -122,7 +122,7 @@ const harvest = async (req: Request, res: Response) => {
   }
 };
 
-const plant = async (req: Request, res: Response) => {
+const start = async (req: Request, res: Response) => {
   if (req.isUnauthenticated()) {
     throw createHttpError(401, "User is not authentificated");
   }
@@ -199,5 +199,5 @@ const plant = async (req: Request, res: Response) => {
 export default {
   retrieve,
   harvest,
-  plant,
+  start,
 };

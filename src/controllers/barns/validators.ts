@@ -33,7 +33,10 @@ export const validateStartBody = (body: Partial<BarnsStartBody>) => {
     throw createHttpError(400, "Animal required");
   }
   if (!(animal in AnimalEnum)) {
-    throw createHttpError(400, `Animal must be in enum ${AnimalEnum}`);
+    throw createHttpError(
+      400,
+      `Animal must be in enum [${Object.values(AnimalEnum)}]`,
+    );
   }
 
   return body as BarnsStartBody;
