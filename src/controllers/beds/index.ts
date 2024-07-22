@@ -207,6 +207,7 @@ const plant = async (req: Request, res: Response) => {
 
     const bedRepo = queryRunner.manager.getRepository(Bed);
     const seedRepo = queryRunner.manager.getRepository(Seed);
+    const inventoryRepo = queryRunner.manager.getRepository(Inventory);
 
     const bedExists = await bedRepo.exist({
       where: { index: index, user: { id: user.id } },
@@ -236,7 +237,39 @@ const plant = async (req: Request, res: Response) => {
     });
 
     if (!seed) {
-      throw createHttpError(409, "No such seed found");
+      throw createHttpError(404, "No such seed found");
+    }
+
+    const inventory = await inventoryRepo.findOne({
+      where: { user: { id: user.id } },
+      relations: {
+        items: { inventoryItem: true },
+      },
+    });
+
+    if (!inventory) {
+      throw createHttpError(404, "No inventory found");
+    }
+
+    const slots = inventory.items;
+
+    const seedSlotIndex = slots.findIndex(
+      (slot) => slot.inventoryItem.seed?.id === seed.id,
+    );
+
+    if (seedSlotIndex === -1) {
+      throw createHttpError(404, "No seed slot found");
+    }
+
+    if (slots[seedSlotIndex].amount > 1) {
+      // INFO: decrement this slot
+      slots[seedSlotIndex].amount -= 1;
+      await queryRunner.manager.save(slots[seedSlotIndex]);
+    } else {
+      // INFO: remove this slot
+      await queryRunner.manager.delete(InventorySlot, {
+        id: slots[seedSlotIndex].id,
+      });
     }
 
     await queryRunner.manager.update(

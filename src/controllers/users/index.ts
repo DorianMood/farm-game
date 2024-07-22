@@ -9,6 +9,7 @@ import { Task } from "../../entities/task";
 import { UserTask } from "../../entities/user-task";
 import { Inventory } from "../../entities/inventory";
 import { Barn } from "../../entities/barn";
+import { Animal } from "../../entities/animal";
 
 import type { UsersCreateBody } from "../../types/routes/users";
 import { validateCreateBody } from "./validators";
@@ -104,10 +105,13 @@ const create = async (
     newUser.beds = newBeds;
 
     // Create 4 barns for each user
+    const animalRepo = queryRunner.manager.getRepository(Animal);
+    const animals = await animalRepo.find();
     const newBarns: Barn[] = [];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < animals.length; i++) {
       const newBarn = new Barn();
       newBarn.index = i;
+      newBarn.animal = animals[i];
 
       await queryRunner.manager.save(newBarn);
 
