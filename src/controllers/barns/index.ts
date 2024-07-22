@@ -32,6 +32,9 @@ const retrieve = async (req: Request, res: Response) => {
       relations: ["animal"],
     });
 
+    // We need to release the query runner to not keep a useless connection to the database
+    await queryRunner.release();
+
     return res.json(barns);
   } catch (err) {
     // As an exception occured, cancel the transaction
@@ -39,6 +42,9 @@ const retrieve = async (req: Request, res: Response) => {
     // We need to release the query runner to not keep a useless connection to the database
     await queryRunner.release();
     throw err;
+  } finally {
+    // We need to release the query runner to not keep a useless connection to the database
+    await queryRunner.release();
   }
 };
 
@@ -87,6 +93,7 @@ const harvest = async (req: Request, res: Response) => {
         startedAt: LessThan(
           new Date(Date.now() - animal.harvestTimeout).toISOString(),
         ),
+        animal: true,
       },
     });
 
@@ -97,7 +104,8 @@ const harvest = async (req: Request, res: Response) => {
     await queryRunner.manager.update(
       Barn,
       { index, user },
-      { startedAt: null, animal: null },
+      // INFO: reset timer
+      { startedAt: new Date().toISOString() },
     );
 
     // TODO: add resource to inventory
@@ -159,6 +167,7 @@ const start = async (req: Request, res: Response) => {
         index: index,
         user: { id: user.id },
         animal: IsNull(),
+        startedAt: IsNull(),
       },
     });
 

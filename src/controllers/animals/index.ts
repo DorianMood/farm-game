@@ -36,6 +36,8 @@ const retrieve = async (req: Request, res: Response) => {
 
   const animals = inventory?.items.filter((item) => item.inventoryItem.animal);
 
+  await queryRunner.release();
+
   return res.json(animals);
 };
 

@@ -35,6 +35,9 @@ const retrieve = async (req: Request, res: Response) => {
       relations: ["crop"],
     });
 
+    // We need to release the query runner to not keep a useless connection to the database
+    await queryRunner.release();
+
     return res.json(beds);
   } catch (err) {
     // As an exception occured, cancel the transaction
@@ -42,6 +45,9 @@ const retrieve = async (req: Request, res: Response) => {
     // We need to release the query runner to not keep a useless connection to the database
     await queryRunner.release();
     throw err;
+  } finally {
+    // We need to release the query runner to not keep a useless connection to the database
+    await queryRunner.release();
   }
 };
 
