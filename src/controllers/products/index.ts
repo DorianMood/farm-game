@@ -1,11 +1,15 @@
 import type { Request, Response } from "express";
 import createHttpError from "http-errors";
 
-import { LessThanOrEqual } from "typeorm";
+import { IsNull, LessThanOrEqual } from "typeorm";
+
+import { InventoryItemCategoryEnum } from "../../common/enums";
 
 import { type RetrieveProductsQuery } from "../../types/routes/products";
 
 import { AppDataSource } from "../../data-source";
+
+import { Barn } from "../../entities/barn";
 import { InventoryItem } from "../../entities/inventory-item";
 import { InventorySlot } from "../../entities/inventory-slot";
 import { Inventory } from "../../entities/inventory";
@@ -53,6 +57,7 @@ const purchase = async (req: Request, res: Response) => {
 
     const inventoryRepo = queryRunner.manager.getRepository(Inventory);
     const inventoryItemRepo = queryRunner.manager.getRepository(InventoryItem);
+    const barnRepo = queryRunner.manager.getRepository(Barn);
 
     const inventoryItemToPurchase = await inventoryItemRepo.findOne({
       where: { id: id },
@@ -105,6 +110,39 @@ const purchase = async (req: Request, res: Response) => {
       inventory.items.push(inventorySlot);
     } else {
       inventory.items[inventorySlotIndex].amount += 1;
+    }
+
+    // INFO: in case user bought an animal put it in barn
+    if (inventoryItemToPurchase.category === InventoryItemCategoryEnum.Animal) {
+      const animal = inventoryItemToPurchase.animal;
+
+      if (!animal) {
+        throw createHttpError(404, "Animal not found");
+      }
+
+      const hasAnimalInBarn = await barnRepo.exists({
+        where: { user: { id: user.id }, animal: { id: animal.id } },
+      });
+
+      // There is no barn with this animal
+      // it means that we should place this aniaml in this barn
+      if (!hasAnimalInBarn) {
+        const barn = await barnRepo.findOneBy({
+          user: { id: user.id },
+          animal: { id: IsNull() },
+        });
+
+        if (!barn) {
+          throw createHttpError(404, "Empty barn not found");
+        }
+
+        barn.animal = animal;
+        await queryRunner.manager.update(
+          Barn,
+          { id: barn.id },
+          { startedAt: new Date().toISOString(), animal: animal },
+        );
+      }
     }
 
     await queryRunner.manager.save(user);
@@ -171,6 +209,31 @@ const sell = async (req: Request, res: Response) => {
 
     if (inventorySlotToSell.amount === amount) {
       await queryRunner.manager.remove(inventorySlotToSell);
+
+      if (
+        inventorySlotToSell.inventoryItem.category ===
+        InventoryItemCategoryEnum.Animal
+      ) {
+        const animal = inventorySlotToSell.inventoryItem.animal;
+
+        if (animal) {
+          const barn = await queryRunner.manager.findOneBy(Barn, {
+            user: { id: user.id },
+            animal: { id: animal.id },
+          });
+
+          await queryRunner.manager.update(
+            Barn,
+            {
+              id: barn?.id,
+            },
+            {
+              startedAt: null,
+              animal: null,
+            },
+          );
+        }
+      }
     } else {
       inventorySlotToSell.amount -= 1;
       await queryRunner.manager.save(inventorySlotToSell);

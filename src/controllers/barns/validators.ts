@@ -1,33 +1,10 @@
 import createHttpError from "http-errors";
 
-import type {
-  BarnsHarvestBody,
-  BarnsStartBody,
-} from "../../types/routes/barns";
+import type { BarnsHarvestBody } from "../../types/routes/barns";
 import { AnimalEnum } from "../../common/enums";
 
 export const validateHarvestBody = (body: Partial<BarnsHarvestBody>) => {
-  const { index } = body;
-
-  if (index === undefined) {
-    throw createHttpError(400, "Barn index required");
-  }
-  if (!Number.isInteger(index)) {
-    throw createHttpError(400, "Barn index must be integer");
-  }
-
-  return body as BarnsHarvestBody;
-};
-
-export const validateStartBody = (body: Partial<BarnsStartBody>) => {
-  const { index, animal } = body;
-
-  if (index === undefined) {
-    throw createHttpError(400, "Barn index required");
-  }
-  if (!Number.isInteger(index)) {
-    throw createHttpError(400, "Barn index must be integer");
-  }
+  const { animal } = body;
 
   if (animal === undefined) {
     throw createHttpError(400, "Animal required");
@@ -39,5 +16,5 @@ export const validateStartBody = (body: Partial<BarnsStartBody>) => {
     );
   }
 
-  return body as BarnsStartBody;
+  return body as BarnsHarvestBody;
 };
