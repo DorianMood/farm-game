@@ -1,6 +1,8 @@
 import type { Request, Response } from "express";
 import createHttpError from "http-errors";
-import { LessThan, IsNull } from "typeorm";
+import { LessThan, IsNull, Or, Equal, Not } from "typeorm";
+
+import { TaskEnum } from "../../entities/task";
 
 import { TASK_TIMEOUT } from "../../common/constants";
 import { UserTask } from "../../entities/user-task";
@@ -23,13 +25,32 @@ const retrieve = async (req: Request, res: Response) => {
   const userTasks = await userTasksRepo.find({
     where: {
       user: { id: user.id },
+      completedAt: Or(IsNull()),
+      task: { type: Not(Equal(TaskEnum.FinanceGenius)) },
     },
     relations: {
       task: true,
     },
   });
 
-  return res.json(userTasks);
+  const userSurveyTask = await userTasksRepo.findOne({
+    where: {
+      user: { id: user.id },
+      completedAt: Or(IsNull()),
+      task: { type: Equal(TaskEnum.FinanceGenius) },
+    },
+    relations: {
+      task: true,
+    },
+  });
+
+  const result = userTasks;
+
+  if (userSurveyTask) {
+    result.push(userSurveyTask);
+  }
+
+  return res.json(result);
 };
 
 const complete = async (req: Request, res: Response) => {

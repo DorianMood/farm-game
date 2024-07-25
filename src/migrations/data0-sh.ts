@@ -5,7 +5,7 @@ import { Survey } from "../entities/survey";
 import { Task, TaskEnum } from "../entities/task";
 import { UserTask } from "../entities/user-task";
 
-const surveys = [
+const data = [
   [
     { question: "Обесценивание денег", answer: "Инфляция" },
     { question: "Иностранные деньги", answer: "Валюта" },
@@ -23,8 +23,8 @@ const surveys = [
       answer: "Вклад",
     },
     {
-      question: "14 лет",
-      answer: "C какого возраста можно оформить банковскую карту в России?",
+      question: "C какого возраста можно оформить банковскую карту в России?",
+      answer: "14 лет",
     },
     { question: "Кредит на покупку жилья", answer: "Ипотека" },
   ],
@@ -67,8 +67,8 @@ const surveys = [
   ],
   [
     {
-      question: 'Что такое "депозит" в банковском терминологии?',
-      answer: "Деньги, которые клиенты вносят на свои счета в банке",
+      question: "Деньги, которые клиенты вносят на свои счета в банке",
+      answer: "Депозит",
     },
     {
       question:
@@ -161,32 +161,37 @@ export class Sh2000000000000 implements MigrationInterface {
     plantTask.type = TaskEnum.Plant;
     plantTask.cost = 1;
 
-    const surveyTask = new Task();
-    surveyTask.type = TaskEnum.FinanceGenius;
-    surveyTask.cost = 10;
-
     const gameTask = new Task();
     gameTask.type = TaskEnum.CustomGame;
     gameTask.cost = 100;
 
-    await taskRepo.save([plantTask, surveyTask, gameTask]);
+    await taskRepo.save([plantTask, gameTask]);
 
-    // Questions
-    const questions: Question[] = [];
-    for (let i = 0; i < surveys[0].length; i++) {
-      const question = new Question();
-      question.question = surveys[0][i].question;
-      question.answer = surveys[0][i].answer;
-      questions.push(question);
+    for (const surveyData of data) {
+      // Questions
+      const questions: Question[] = [];
+      for (let i = 0; i < surveyData.length; i++) {
+        const question = new Question();
+        question.question = surveyData[i].question;
+        question.answer = surveyData[i].answer;
+        questions.push(question);
+      }
+      // INFO: no need to save questions here, save with relation to survey
+
+      // Survey
+
+      const surveyTask = new Task();
+      surveyTask.type = TaskEnum.FinanceGenius;
+      surveyTask.cost = 10;
+
+      await taskRepo.save(surveyTask);
+
+      const surveyRepo = queryRunner.manager.getRepository(Survey);
+      const survey = new Survey();
+      survey.task = surveyTask;
+      survey.questions = questions;
+      await surveyRepo.save(survey);
     }
-    // INFO: no need to save questions here, save with relation to survey
-
-    // Survey
-    const surveyRepo = queryRunner.manager.getRepository(Survey);
-    const survey = new Survey();
-    survey.task = surveyTask;
-    survey.questions = questions;
-    await surveyRepo.save(survey);
 
     await queryRunner.commitTransaction();
   }
