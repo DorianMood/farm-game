@@ -33,21 +33,30 @@ const retrieve = async (req: Request, res: Response) => {
     },
   });
 
-  const userSurveyTask = await userTasksRepo.findOne({
+  const result = userTasks;
+
+  const hasCompletedSurveyRecently = await userTasksRepo.exist({
     where: {
       user: { id: user.id },
-      completedAt: Or(IsNull()),
-      task: { type: Equal(TaskEnum.FinanceGenius) },
-    },
-    relations: {
-      task: true,
+      completedAt: LessThan(new Date(Date.now() - TASK_TIMEOUT).toISOString()),
     },
   });
 
-  const result = userTasks;
+  if (!hasCompletedSurveyRecently) {
+    const userSurveyTask = await userTasksRepo.findOne({
+      where: {
+        user: { id: user.id },
+        completedAt: Or(IsNull()),
+        task: { type: Equal(TaskEnum.FinanceGenius) },
+      },
+      relations: {
+        task: true,
+      },
+    });
 
-  if (userSurveyTask) {
-    result.push(userSurveyTask);
+    if (userSurveyTask) {
+      result.push(userSurveyTask);
+    }
   }
 
   return res.json(result);
