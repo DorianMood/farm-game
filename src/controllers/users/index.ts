@@ -1,6 +1,8 @@
 import type { Request, Response } from "express";
 import createHttpError from "http-errors";
 
+import { LessThan, MoreThan } from "typeorm";
+
 import { AppDataSource } from "../../data-source";
 
 import { User } from "../../entities/user";
@@ -44,7 +46,9 @@ const create = async (
   req: TypedRequestBody<UsersCreateBody>,
   res: Response,
 ) => {
-  const { username, email, password } = validateCreateBody(req.body);
+  const { username, email, password, city, name } = validateCreateBody(
+    req.body,
+  );
 
   // Create a query runner to control the transactions, it allows to cancel the transaction if we need to
   const queryRunner = AppDataSource.createQueryRunner();
@@ -66,6 +70,7 @@ const create = async (
     const emailExists = await userRepo.exist({
       where: { email },
     });
+
     if (emailExists) {
       throw createHttpError(409, "Email already exists");
     }
@@ -73,6 +78,8 @@ const create = async (
     const newUser = new User();
     newUser.username = username;
     newUser.email = email;
+    newUser.city = city;
+    newUser.name = name;
     newUser.setPassword(password);
 
     // Assign all available tasks to each user
@@ -143,7 +150,47 @@ const create = async (
   }
 };
 
+const rating = async (
+  req: TypedRequestBody<UsersCreateBody>,
+  res: Response,
+) => {
+  if (req.isUnauthenticated()) {
+    throw createHttpError(401, "User is not authentificated");
+  }
+
+  const user = req.user;
+
+  if (!user) {
+    throw createHttpError(401, "User is not authentificated");
+  }
+
+  const queryRunner = AppDataSource.createQueryRunner();
+
+  const above = await queryRunner.manager.find(User, {
+    where: { ballance: MoreThan(user.ballance) },
+    order: { ballance: "DESC" },
+    select: ["id", "ballance", "username", "city", "name"],
+    take: 3,
+  });
+
+  const below = await queryRunner.manager.find(User, {
+    where: { ballance: LessThan(user.ballance) },
+    order: { ballance: "DESC" },
+    select: ["id", "ballance", "username", "city", "name"],
+    take: 3,
+  });
+
+  await queryRunner.release();
+
+  return res.json({
+    above,
+    user,
+    below,
+  });
+};
+
 export default {
   create,
   retrieve,
+  rating,
 };

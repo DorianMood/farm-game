@@ -15,6 +15,12 @@ export class User extends IdDates {
   @Column({ nullable: false, unique: true, length: 255 })
   email!: string;
 
+  @Column({ nullable: false, type: "text", default: "" })
+  name!: string;
+
+  @Column({ nullable: true, type: "text", default: null })
+  city?: string;
+
   @Column({ nullable: false, select: false })
   hashPassword!: string;
 

@@ -4,7 +4,7 @@ import isEmail from "validator/lib/isEmail";
 import type { UsersCreateBody } from "../../types/routes/users";
 
 export const validateCreateBody = (body: Partial<UsersCreateBody>) => {
-  const { username, email, password } = body;
+  const { username, email, password, city, name } = body;
 
   if (!username) {
     throw createHttpError(400, "Username required");
@@ -27,8 +27,18 @@ export const validateCreateBody = (body: Partial<UsersCreateBody>) => {
     throw createHttpError(400, "Password must contain at least 8 characters");
   }
 
+  if (city && typeof city !== "string") {
+    throw createHttpError(400, "City must be a string");
+  }
+
+  if (!name) {
+    throw createHttpError(400, "Name required");
+  }
+  if (typeof name !== "string") {
+    throw createHttpError(400, "Name must be a string");
+  }
+
   // As the function checked the properties are not missing,
   // return the body as original type
   return body as UsersCreateBody;
 };
-
