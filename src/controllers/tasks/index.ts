@@ -39,6 +39,7 @@ const retrieve = async (req: Request, res: Response) => {
     where: {
       user: { id: user.id },
       completedAt: LessThan(new Date(Date.now() - TASK_TIMEOUT).toISOString()),
+      task: { type: Equal(TaskEnum.FinanceGenius) },
     },
   });
 
@@ -46,7 +47,7 @@ const retrieve = async (req: Request, res: Response) => {
     const userSurveyTask = await userTasksRepo.findOne({
       where: {
         user: { id: user.id },
-        completedAt: Or(IsNull()),
+        completedAt: IsNull(),
         task: { type: Equal(TaskEnum.FinanceGenius) },
       },
       relations: {
