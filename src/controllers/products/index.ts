@@ -136,12 +136,28 @@ const purchase = async (req: Request, res: Response) => {
           throw createHttpError(404, "Empty barn not found");
         }
 
-        barn.animal = animal;
         await queryRunner.manager.update(
           Barn,
           { id: barn.id },
           { startedAt: new Date().toISOString(), animal: animal },
         );
+      } else {
+        const barn = await barnRepo.findOneBy({
+          user: { id: user.id },
+          animal: { id: animal.id },
+        });
+
+        if (!barn) {
+          throw createHttpError(404, "Barn with this animal not found");
+        }
+
+        if (!barn.startedAt) {
+          await queryRunner.manager.update(
+            Barn,
+            { id: barn.id },
+            { startedAt: new Date().toISOString() },
+          );
+        }
       }
     }
 
