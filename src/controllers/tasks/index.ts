@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import createHttpError from "http-errors";
-import { LessThan, IsNull, Or, Equal, Not } from "typeorm";
+import { LessThan, IsNull, Or, Equal, Not, MoreThan } from "typeorm";
 
 import { TaskEnum } from "../../entities/task";
 
@@ -38,7 +38,7 @@ const retrieve = async (req: Request, res: Response) => {
   const hasCompletedSurveyRecently = await userTasksRepo.exist({
     where: {
       user: { id: user.id },
-      completedAt: LessThan(new Date(Date.now() - TASK_TIMEOUT).toISOString()),
+      completedAt: MoreThan(new Date(Date.now() - TASK_TIMEOUT).toISOString()),
       task: { type: Equal(TaskEnum.FinanceGenius) },
     },
   });

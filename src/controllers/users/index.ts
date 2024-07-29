@@ -80,6 +80,7 @@ const create = async (
     newUser.email = email;
     newUser.city = city;
     newUser.name = name;
+    newUser.ballance = 50;
     newUser.setPassword(password);
 
     // Assign all available tasks to each user
