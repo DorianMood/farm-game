@@ -35,9 +35,18 @@ const retrieve = async (req: Request, res: Response) => {
     },
   });
 
+  const userWithRank: { rank: number }[] = await queryRunner.manager.query(`
+  -- This user's rank
+  SELECT rank FROM (
+	  SELECT CAST(ROW_NUMBER() OVER(ORDER BY ballance DESC) AS INT) AS rank, id, ballance, username, city, name
+	  FROM "user"
+	  GROUP BY ballance, id) as users_with_rank
+	  WHERE id = '${user.id}'
+  `);
+
   await queryRunner.release();
 
-  return res.json(userWithProducts);
+  return res.json({ userWithProducts, ...userWithRank[0] });
 };
 
 const create = async (
