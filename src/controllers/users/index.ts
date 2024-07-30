@@ -46,7 +46,7 @@ const retrieve = async (req: Request, res: Response) => {
 
   await queryRunner.release();
 
-  return res.json({ userWithProducts, ...userWithRank[0] });
+  return res.json({ ...userWithProducts, ...userWithRank[0] });
 };
 
 const create = async (
