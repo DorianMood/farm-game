@@ -1,8 +1,6 @@
 import type { Request, Response } from "express";
 import createHttpError from "http-errors";
 
-import { LessThan, MoreThan } from "typeorm";
-
 import { AppDataSource } from "../../data-source";
 
 import { User } from "../../entities/user";
@@ -167,26 +165,52 @@ const rating = async (
 
   const queryRunner = AppDataSource.createQueryRunner();
 
-  const above = await queryRunner.manager.find(User, {
-    where: { ballance: MoreThan(user.ballance) },
-    order: { ballance: "DESC" },
-    select: ["id", "ballance", "username", "city", "name"],
-    take: 3,
-  });
+  type UserWithIndex = User & { index: number };
 
-  const below = await queryRunner.manager.find(User, {
-    where: { ballance: LessThan(user.ballance) },
-    order: { ballance: "DESC" },
-    select: ["id", "ballance", "username", "city", "name"],
-    take: 3,
-  });
+  const topUsersWithrankQuery = queryRunner.manager.query(
+    `
+  -- Top of liderboard
+  SELECT * FROM (
+    SELECT CAST(ROW_NUMBER() OVER(ORDER BY ballance DESC) AS INT) AS rank, id, ballance, username, city, name
+    FROM "user"
+    GROUP BY ballance, id
+  ) as users_with_rank
+  WHERE ballance > ${user.ballance}
+  LIMIT 3
+  `,
+  );
+
+  const topUsersWithRank: UserWithIndex[] = await topUsersWithrankQuery;
+
+  const bottomUsersWithRankQuery = queryRunner.manager.query(`
+  -- Bottom of liderboard
+  SELECT *  FROM (SELECT * FROM (
+	  SELECT CAST(ROW_NUMBER() OVER(ORDER BY ballance DESC) AS INT) AS rank, id, ballance, username, city, name
+	  FROM "user"
+	  GROUP BY ballance, id) as users_with_rank
+	  WHERE ballance < ${user.ballance}
+	  ORDER BY rank DESC
+	  LIMIT 3) as bottom_users_with_rank
+	  ORDER BY rank ASC
+  `);
+
+  const botUsersWithRank: UserWithIndex[] = await bottomUsersWithRankQuery;
+
+  const userWithRank: UserWithIndex[] = await queryRunner.manager.query(`
+  -- This user
+  SELECT * FROM (
+	  SELECT CAST(ROW_NUMBER() OVER(ORDER BY ballance DESC) AS INT) AS rank, id, ballance, username, city, name
+	  FROM "user"
+	  GROUP BY ballance, id) as users_with_rank
+	  WHERE id = '${user.id}'
+  `);
 
   await queryRunner.release();
 
   return res.json({
-    above,
-    user,
-    below,
+    above: topUsersWithRank,
+    user: userWithRank[0],
+    below: botUsersWithRank,
   });
 };
 
