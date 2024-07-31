@@ -13,6 +13,7 @@ import {
 import { SeedProduct } from "../entities/seed-product";
 import { AnimalProduct } from "../entities/animal-product";
 import { Fertilizer } from "../entities/fertilizer";
+import { Vitamin } from "../entities/vitamin";
 
 /**
  * INFO:
@@ -203,6 +204,15 @@ const data = {
       sellMultiplier: 1,
     },
   ],
+  vitamins: [
+    {
+      name: "Витамины",
+      description:
+        "Витамины используются для ускорения созревания животных. Купите и примените его для того чтобы витамины возымели эффект.",
+      price: 200,
+      sellMultiplier: 1,
+    },
+  ],
 };
 
 export class Sh2000000000001 implements MigrationInterface {
@@ -315,6 +325,26 @@ export class Sh2000000000001 implements MigrationInterface {
     }
 
     await inventoryItemRepo.save(fertilizers);
+
+    // Vitamins
+    const vitamins: InventoryItem[] = [];
+
+    for (let i = 0; i < data.vitamins.length; i++) {
+      const item = data.vitamins[i];
+
+      const vitamin = new Vitamin();
+
+      const inventoryItem = new InventoryItem();
+      inventoryItem.name = item.name;
+      inventoryItem.description = item.description;
+      inventoryItem.price = item.price;
+      inventoryItem.vitamin = vitamin;
+      inventoryItem.sellMultiplier = item.sellMultiplier;
+      inventoryItem.category = InventoryItemCategoryEnum.Vitamin;
+      vitamins.push(inventoryItem);
+    }
+
+    await inventoryItemRepo.save(vitamins);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

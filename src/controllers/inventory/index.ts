@@ -2,11 +2,14 @@ import createHttpError from "http-errors";
 import { IsNull, Not } from "typeorm";
 import type { Request, Response } from "express";
 
+import { InventoryItemCategoryEnum } from "../../common/enums";
+
 import { AppDataSource } from "../../data-source";
 import { User } from "../../entities/user";
 import { Inventory } from "../../entities/inventory";
 import { InventorySlot } from "../../entities/inventory-slot";
 import { Bed } from "../../entities/bed";
+import { Barn } from "../../entities/barn";
 
 import { validateApplyBody } from "./validators";
 
@@ -100,58 +103,105 @@ const activate = async (req: Request, res: Response) => {
     throw createHttpError(400, "Not found inventory slot with given id");
   }
 
-  if (!inventorySlotToActivate.inventoryItem.fertilizer) {
-    // INFO: when adding new inventory item that could be activated, also add it here
-    throw createHttpError(
-      400,
-      "Not a fertilizer, can only activate fertilizer",
-    );
-  }
+  switch (inventorySlotToActivate.inventoryItem.category) {
+    case InventoryItemCategoryEnum.Fertilizer: {
+      // INFO: activate inventory slot
+      const bedRepo = queryRunner.manager.getRepository(Bed);
 
-  // INFO: activate inventory slot
-  const bedRepo = queryRunner.manager.getRepository(Bed);
+      const beds = await bedRepo.find({
+        where: {
+          user: { id: user.id },
+          plantedAt: Not(IsNull()),
+        },
+        relations: ["crop"],
+      });
 
-  const beds = await bedRepo.find({
-    where: {
-      user: { id: user.id },
-      plantedAt: Not(IsNull()),
-    },
-    relations: ["crop"],
-  });
+      const now = Date.now();
 
-  const now = Date.now();
+      const maxPeriod = beds.reduce((max, bed) => {
+        const harvestTime =
+          new Date(bed.plantedAt!).getTime() + (bed.crop?.harvestTimeout ?? 0);
 
-  const maxPeriod = beds.reduce((max, bed) => {
-    const harvestTime =
-      new Date(bed.plantedAt!).getTime() + (bed.crop?.harvestTimeout ?? 0);
+        const remindingTime = harvestTime - now;
 
-    const remindingTime = harvestTime - now;
+        if (remindingTime > max) {
+          return remindingTime;
+        }
 
-    if (remindingTime > max) {
-      return remindingTime;
+        return max;
+      }, 0);
+
+      if (maxPeriod <= 0) {
+        throw createHttpError(400, "Cannot apply fertilizer, all beds ready");
+      }
+
+      for (let i = 0; i < beds.length; i++) {
+        beds[i].plantedAt = new Date(
+          new Date(beds[i].plantedAt!).getTime() - maxPeriod,
+        ).toISOString();
+      }
+
+      await queryRunner.manager.save(beds);
+
+      // INFO: remove or decrement inventory slot
+      if (inventorySlotToActivate.amount === 1) {
+        await queryRunner.manager.remove(inventorySlotToActivate);
+      } else {
+        inventorySlotToActivate.amount -= 1;
+        await queryRunner.manager.save(inventorySlotToActivate);
+      }
+      break;
     }
+    case InventoryItemCategoryEnum.Vitamin: {
+      // INFO: activate inventory slot
+      const barnRepo = queryRunner.manager.getRepository(Barn);
 
-    return max;
-  }, 0);
+      const barns = await barnRepo.find({
+        where: {
+          user: { id: user.id },
+          startedAt: Not(IsNull()),
+        },
+        relations: ["animal"],
+      });
 
-  if (maxPeriod <= 0) {
-    throw createHttpError(400, "Cannot apply fertilizer, all beds ready");
-  }
+      const now = Date.now();
 
-  for (let i = 0; i < beds.length; i++) {
-    beds[i].plantedAt = new Date(
-      new Date(beds[i].plantedAt!).getTime() - maxPeriod,
-    ).toISOString();
-  }
+      const maxPeriod = barns.reduce((max, barn) => {
+        const harvestTime =
+          new Date(barn.startedAt!).getTime() +
+          (barn.animal?.harvestTimeout ?? 0);
 
-  await queryRunner.manager.save(beds);
+        const remindingTime = harvestTime - now;
 
-  // INFO: remove or decrement inventory slot
-  if (inventorySlotToActivate.amount === 1) {
-    await queryRunner.manager.remove(inventorySlotToActivate);
-  } else {
-    inventorySlotToActivate.amount -= 1;
-    await queryRunner.manager.save(inventorySlotToActivate);
+        if (remindingTime > max) {
+          return remindingTime;
+        }
+
+        return max;
+      }, 0);
+
+      if (maxPeriod <= 0) {
+        throw createHttpError(400, "Cannot apply vitamin, all barns ready");
+      }
+
+      for (let i = 0; i < barns.length; i++) {
+        barns[i].startedAt = new Date(
+          new Date(barns[i].startedAt!).getTime() - maxPeriod,
+        ).toISOString();
+      }
+
+      await queryRunner.manager.save(barns);
+      // INFO: remove or decrement inventory slot
+      if (inventorySlotToActivate.amount === 1) {
+        await queryRunner.manager.remove(inventorySlotToActivate);
+      } else {
+        inventorySlotToActivate.amount -= 1;
+        await queryRunner.manager.save(inventorySlotToActivate);
+      }
+      break;
+    }
+    default:
+      throw createHttpError(400, "Not a fertilizer or vitamin");
   }
 
   await queryRunner.release();

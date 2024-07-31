@@ -4,8 +4,8 @@ import { Id } from "./helpers";
 import { InventoryItem } from "./inventory-item";
 
 @Entity()
-export class Fertilizer extends Id {
-  @OneToOne(() => InventoryItem, (inventoryItem) => inventoryItem.fertilizer, {
+export class Vitamin extends Id {
+  @OneToOne(() => InventoryItem, (inventoryItem) => inventoryItem.vitamin, {
     onDelete: "CASCADE",
   })
   @JoinColumn()
