@@ -12,6 +12,7 @@ import {
 } from "../common/enums";
 import { SeedProduct } from "../entities/seed-product";
 import { AnimalProduct } from "../entities/animal-product";
+import { Fertilizer } from "../entities/fertilizer";
 
 /**
  * INFO:
@@ -156,7 +157,7 @@ const data = {
       type: SeedProductEnum.Carrot,
       name: "Морковь",
       description:
-        "Морковь — это овощ, который выращивается на фермах и является одним из самых популярных источников витаминов и минералов. Морковь используется для приготовления различных блюд, таких как салаты, супы и многое другое. Для получения моркови необходимо посадить семена моркови.",
+        "Морковь — это овощ, который выращивается на фермах, она используется для приготовления различных блюд, таких как салаты, супы и многое другое. Для получения моркови необходимо посадить семена моркови.",
       price: 12,
       sellMultiplier: 1,
     },
@@ -190,6 +191,15 @@ const data = {
       description:
         "Цветы — это растения, которые выращиваются на фермах и являются одними из самых популярных декоративных растений. Для получения цветов необходимо посадить луковицы или семена цветов.",
       price: 60,
+      sellMultiplier: 1,
+    },
+  ],
+  fertilizers: [
+    {
+      name: "Удобрение",
+      description:
+        "Удобрения используются для ускорения созревания растений. Купите и примените его для того чтобы удобрение возымело эффект.",
+      price: 200,
       sellMultiplier: 1,
     },
   ],
@@ -285,6 +295,26 @@ export class Sh2000000000001 implements MigrationInterface {
     }
 
     await inventoryItemRepo.save(seedProducts);
+
+    // Fertilizers
+    const fertilizers: InventoryItem[] = [];
+
+    for (let i = 0; i < data.fertilizers.length; i++) {
+      const item = data.fertilizers[i];
+
+      const fertilizer = new Fertilizer();
+
+      const inventoryItem = new InventoryItem();
+      inventoryItem.name = item.name;
+      inventoryItem.description = item.description;
+      inventoryItem.price = item.price;
+      inventoryItem.fertilizer = fertilizer;
+      inventoryItem.sellMultiplier = item.sellMultiplier;
+      inventoryItem.category = InventoryItemCategoryEnum.Fertilizer;
+      fertilizers.push(inventoryItem);
+    }
+
+    await inventoryItemRepo.save(fertilizers);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

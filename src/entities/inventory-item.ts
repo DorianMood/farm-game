@@ -8,6 +8,7 @@ import { Seed } from "./seed";
 import { AnimalProduct } from "./animal-product";
 import { SeedProduct } from "./seed-product";
 import { PromoCode } from "./promo-code";
+import { Fertilizer } from "./fertilizer";
 
 @Entity()
 export class InventoryItem extends IdDates {
@@ -69,4 +70,11 @@ export class InventoryItem extends IdDates {
     eager: true,
   })
   promoCode?: PromoCode;
+
+  @OneToOne(() => Fertilizer, (fertilizer) => fertilizer.inventoryItem, {
+    nullable: true,
+    cascade: true,
+    eager: true,
+  })
+  fertilizer?: Fertilizer;
 }
