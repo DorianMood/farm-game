@@ -87,7 +87,7 @@ const create = async (
     newUser.email = email;
     newUser.city = city;
     newUser.name = name;
-    newUser.ballance = 50;
+    newUser.ballance = 100;
     newUser.setPassword(password);
 
     // Assign all available tasks to each user
@@ -104,8 +104,6 @@ const create = async (
       userTasks.push(userTask);
     }
     newUser.tasks = userTasks;
-
-    newUser.ballance = 0;
 
     // Create 10 beds for each user
     const newBeds: Bed[] = [];
