@@ -62,40 +62,6 @@ const harvest = async (req: Request, res: Response) => {
       throw createHttpError(401, "User is not authentificated");
     }
 
-    // const bedRepo = queryRunner.manager.getRepository(Bed);
-    //
-    // const bedExists = await bedRepo.exist({
-    //   where: { index: index, user: { id: user.id } },
-    // });
-    //
-    // if (!bedExists) {
-    //   throw createHttpError(404, "Bed with given index not found");
-    // }
-    //
-    // const bedReady = await bedRepo.exist({
-    //   where: {
-    //     index: index,
-    //     user: { id: user.id },
-    //     plantedAt: LessThan(
-    //       new Date(Date.now() - BED_GROWING_TIMEOUT).toISOString(),
-    //     ),
-    //   },
-    // });
-    //
-    // if (!bedReady) {
-    //   throw createHttpError(409, "Bed is not ready");
-    // }
-    //
-    // await queryRunner.manager.update(
-    //   Bed,
-    //   { index, user },
-    //   { plantedAt: null, crop: null },
-    // );
-    //
-    // user.ballance += BED_HARVEST_REWARD;
-    //
-    // await queryRunner.manager.save(user);
-
     await queryRunner.commitTransaction();
     // We need to release the query runner to not keep a useless connection to the database
     await queryRunner.release();
