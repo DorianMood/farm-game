@@ -26,6 +26,8 @@ export default session({
     secure: process.env.NODE_ENV === "production",
     httpOnly: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    domain:
+      process.env.NODE_ENV === "production" ? "93.93.207.63:444" : undefined,
     maxAge: 90 * 24 * 60 * 60 * 1000, // 3 months
   },
 });
