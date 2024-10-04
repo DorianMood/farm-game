@@ -2,9 +2,10 @@ import createHttpError from "http-errors";
 import isEmail from "validator/lib/isEmail";
 
 import type { UsersCreateBody } from "../../types/routes/users";
+import { UserCharacterEnum } from "../../common/enums";
 
 export const validateCreateBody = (body: Partial<UsersCreateBody>) => {
-  const { username, email, password, city, name } = body;
+  const { username, email, password, city, name, character } = body;
 
   if (!username) {
     throw createHttpError(400, "Username required");
@@ -36,6 +37,10 @@ export const validateCreateBody = (body: Partial<UsersCreateBody>) => {
   }
   if (typeof name !== "string") {
     throw createHttpError(400, "Name must be a string");
+  }
+
+  if (character && !(character in UserCharacterEnum)) {
+    throw createHttpError(400, `Character must be in ${UserCharacterEnum}`);
   }
 
   // As the function checked the properties are not missing,

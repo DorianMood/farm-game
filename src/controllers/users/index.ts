@@ -13,6 +13,7 @@ import { Animal } from "../../entities/animal";
 
 import type { UsersCreateBody } from "../../types/routes/users";
 import { validateCreateBody } from "./validators";
+import { UserCharacterEnum } from "../../common/enums";
 
 const retrieve = async (req: Request, res: Response) => {
   if (req.isUnauthenticated()) {
@@ -53,9 +54,8 @@ const create = async (
   req: TypedRequestBody<UsersCreateBody>,
   res: Response,
 ) => {
-  const { username, email, password, city, name } = validateCreateBody(
-    req.body,
-  );
+  const { username, email, password, city, name, character } =
+    validateCreateBody(req.body);
 
   // Create a query runner to control the transactions, it allows to cancel the transaction if we need to
   const queryRunner = AppDataSource.createQueryRunner();
@@ -66,7 +66,7 @@ const create = async (
 
   try {
     const userRepo = queryRunner.manager.getRepository(User);
-    const usernameExists = await userRepo.exist({
+    const usernameExists = await userRepo.exists({
       where: { username },
     });
 
@@ -74,7 +74,7 @@ const create = async (
       throw createHttpError(409, "Username already exists");
     }
 
-    const emailExists = await userRepo.exist({
+    const emailExists = await userRepo.exists({
       where: { email },
     });
 
@@ -87,6 +87,7 @@ const create = async (
     newUser.email = email;
     newUser.city = city;
     newUser.name = name;
+    newUser.character = character ?? UserCharacterEnum.Male;
     newUser.ballance = 100;
     newUser.setPassword(password);
 

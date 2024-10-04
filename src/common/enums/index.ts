@@ -52,3 +52,8 @@ export enum AnimalProductEnum {
   Sheep = "Sheep",
   Hen = "Hen",
 }
+
+export enum UserCharacterEnum {
+  Male = "Male",
+  Female = "Female",
+}

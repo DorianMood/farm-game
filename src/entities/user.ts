@@ -6,6 +6,7 @@ import { UserTask } from "./user-task";
 import { Inventory } from "./inventory";
 import { IdDates } from "./helpers";
 import { Barn } from "./barn";
+import { UserCharacterEnum } from "../common/enums";
 
 @Entity()
 export class User extends IdDates {
@@ -50,6 +51,13 @@ export class User extends IdDates {
   })
   @JoinColumn()
   inventory!: Inventory;
+
+  @Column({
+    type: "enum",
+    enum: UserCharacterEnum,
+    default: UserCharacterEnum.Male,
+  })
+  character!: UserCharacterEnum;
 
   setPassword(password: string) {
     this.salt = bcrypt.genSaltSync(12);
