@@ -79,9 +79,6 @@ const purchase = async (req: Request, res: Response) => {
       throw createHttpError(400, "Insufficient ballance");
     }
 
-    // INFO: write off money
-    user.ballance -= inventoryItemAvailableForPurchase.price * amount;
-
     // INFO: add item to inventory
     const inventory = await inventoryRepo.findOne({
       where: { user: { id: user.id } },
@@ -120,46 +117,38 @@ const purchase = async (req: Request, res: Response) => {
         throw createHttpError(404, "Animal not found");
       }
 
+      if (amount !== 1) {
+        throw createHttpError(409, "User can only have 1 animal");
+      }
+
       const hasAnimalInBarn = await barnRepo.exists({
         where: { user: { id: user.id }, animal: { id: animal.id } },
       });
 
+      if (hasAnimalInBarn) {
+        throw createHttpError(409, `User already has ${animal.type}`);
+      }
+
       // There is no barn with this animal
       // it means that we should place this aniaml in this barn
-      if (!hasAnimalInBarn) {
-        const barn = await barnRepo.findOneBy({
-          user: { id: user.id },
-          animal: { id: IsNull() },
-        });
+      const barn = await barnRepo.findOneBy({
+        user: { id: user.id },
+        animal: { id: IsNull() },
+      });
 
-        if (!barn) {
-          throw createHttpError(404, "Empty barn not found");
-        }
-
-        await queryRunner.manager.update(
-          Barn,
-          { id: barn.id },
-          { startedAt: new Date().toISOString(), animal: animal },
-        );
-      } else {
-        const barn = await barnRepo.findOneBy({
-          user: { id: user.id },
-          animal: { id: animal.id },
-        });
-
-        if (!barn) {
-          throw createHttpError(404, "Barn with this animal not found");
-        }
-
-        if (!barn.startedAt) {
-          await queryRunner.manager.update(
-            Barn,
-            { id: barn.id },
-            { startedAt: new Date().toISOString() },
-          );
-        }
+      if (!barn) {
+        throw createHttpError(404, "Empty barn not found");
       }
+
+      await queryRunner.manager.update(
+        Barn,
+        { id: barn.id },
+        { startedAt: new Date().toISOString(), animal: animal },
+      );
     }
+
+    // INFO: write off money
+    user.ballance -= inventoryItemAvailableForPurchase.price * amount;
 
     await queryRunner.manager.save(user);
     await queryRunner.manager.save(inventory);
