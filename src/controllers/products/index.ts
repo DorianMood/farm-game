@@ -39,14 +39,14 @@ const purchase = async (req: Request, res: Response) => {
     throw createHttpError(401, "User is not authentificated");
   }
 
-  const { id } = validatePurchaseBody(req.body);
+  const { id, amount } = validatePurchaseBody(req.body);
 
   // Create a query runner to control the transactions, it allows to cancel the transaction if we need to
   const queryRunner = AppDataSource.createQueryRunner();
 
   // Connect the query runner to the database and start the transaction
   await queryRunner.connect();
-  await queryRunner.startTransaction();
+  await queryRunner.startTransaction("SERIALIZABLE");
 
   try {
     const user = req.user;
@@ -71,7 +71,7 @@ const purchase = async (req: Request, res: Response) => {
     const inventoryItemAvailableForPurchase = await inventoryItemRepo.findOneBy(
       {
         id,
-        price: LessThanOrEqual(user.ballance),
+        price: LessThanOrEqual(user.ballance / amount),
       },
     );
 
@@ -80,7 +80,7 @@ const purchase = async (req: Request, res: Response) => {
     }
 
     // INFO: write off money
-    user.ballance -= inventoryItemAvailableForPurchase.price;
+    user.ballance -= inventoryItemAvailableForPurchase.price * amount;
 
     // INFO: add item to inventory
     const inventory = await inventoryRepo.findOne({
@@ -103,13 +103,13 @@ const purchase = async (req: Request, res: Response) => {
     if (inventorySlotIndex === -1) {
       const inventorySlot = new InventorySlot();
 
-      inventorySlot.amount = 1;
+      inventorySlot.amount = amount;
       inventorySlot.inventoryItem = inventoryItemAvailableForPurchase;
       await queryRunner.manager.save(inventorySlot);
 
       inventory.items.push(inventorySlot);
     } else {
-      inventory.items[inventorySlotIndex].amount += 1;
+      inventory.items[inventorySlotIndex].amount += amount;
     }
 
     // INFO: in case user bought an animal put it in barn
@@ -193,7 +193,7 @@ const sell = async (req: Request, res: Response) => {
 
   // Connect the query runner to the database and start the transaction
   await queryRunner.connect();
-  await queryRunner.startTransaction();
+  await queryRunner.startTransaction("SERIALIZABLE");
 
   try {
     const user = req.user;

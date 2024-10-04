@@ -33,25 +33,25 @@ const data = {
   // WARNING: order metters
   animals: [
     {
-      harvestTimeout: 6 * HOUR,
+      harvestTimeout: 1 * HOUR,
       type: AnimalEnum.HenAnimal,
       name: "Курица",
       description:
         "Эта маленькая и трудолюбивая курочка станет отличным дополнением вашей фермы. С её помощью вы сможете получать свежие яйца каждый день, а также заботиться о чистоте вашего двора, что поможет держать насекомых в стороне. Курочка любит клевать зерно и уютно устроиться в своём курятнике. Питомец не только приносит пользу, но и радует глаз своим милым видом.",
-      price: 100,
+      price: 40,
       sellMultiplier: DEFAULT_SELL_MULTIPLIER,
     },
     {
-      harvestTimeout: 12 * HOUR,
+      harvestTimeout: 2 * HOUR,
       type: AnimalEnum.SheepAnimal,
       name: "Овца",
       description:
         "Эта пушистая овечка станет настоящим украшением вашей фермы. Овца дарит не только милый внешний вид, но и полезные продукты: шерсть, которую можно стричь для изготовления одежды и других товаров. Овцы любят пастись на зелёных лугах и отдыхают в тени деревьев. Они также являются дружелюбными и спокойными существами, которые отлично чувствуют себя в компании других животных.",
-      price: 200,
+      price: 80,
       sellMultiplier: DEFAULT_SELL_MULTIPLIER,
     },
     {
-      harvestTimeout: 18 * HOUR,
+      harvestTimeout: 12 * HOUR,
       type: AnimalEnum.CowAnimal,
       name: "Корова",
       description:
@@ -60,12 +60,12 @@ const data = {
       sellMultiplier: DEFAULT_SELL_MULTIPLIER,
     },
     {
-      harvestTimeout: 24 * HOUR,
+      harvestTimeout: 6 * HOUR,
       type: AnimalEnum.PigAnimal,
       name: "Свинья",
       description:
         "Свинья — это не только источник мяса и сала, но и отличный друг для фермера. Они очень дружелюбные и общительные животные, которые любят внимание и заботу.",
-      price: 400,
+      price: 140,
       sellMultiplier: DEFAULT_SELL_MULTIPLIER,
     },
   ],
@@ -209,7 +209,7 @@ const data = {
       name: "Витамины",
       description:
         "Витамины используются для ускорения созревания животных. Купите и примените его для того чтобы витамины возымели эффект.",
-      price: 120,
+      price: 90,
       sellMultiplier: 1,
     },
   ],

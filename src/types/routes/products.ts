@@ -1,5 +1,6 @@
 export interface ProductsPurchaseBody {
   id: string;
+  amount: number;
 }
 
 export interface ProductsSellBody {

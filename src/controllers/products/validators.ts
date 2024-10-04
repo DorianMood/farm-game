@@ -7,7 +7,7 @@ import type {
 } from "../../types/routes/products";
 
 export const validatePurchaseBody = (body: Partial<ProductsPurchaseBody>) => {
-  const { id } = body;
+  const { id, amount } = body;
 
   if (id === undefined) {
     throw createHttpError(400, "Product id required");
@@ -17,6 +17,17 @@ export const validatePurchaseBody = (body: Partial<ProductsPurchaseBody>) => {
   }
   if (!validator.isUUID(id)) {
     throw createHttpError(400, "Product id must be uuid");
+  }
+
+  if (amount) {
+    if (typeof amount !== "number") {
+      throw createHttpError(400, "Amount must be number");
+    }
+    if (amount <= 0) {
+      throw createHttpError(400, "Amount must be positive");
+    }
+  } else {
+    body.amount = 1;
   }
 
   return body as ProductsPurchaseBody;
