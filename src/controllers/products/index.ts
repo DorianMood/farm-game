@@ -245,7 +245,11 @@ const sell = async (req: Request, res: Response) => {
     }
 
     // INFO: top up money
-    user.ballance += inventorySlotToSell.inventoryItem.price * amount;
+    user.ballance += Math.ceil(
+      inventorySlotToSell.inventoryItem.sellMultiplier *
+        inventorySlotToSell.inventoryItem.price *
+        amount,
+    );
 
     await queryRunner.manager.save(user);
 
