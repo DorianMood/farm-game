@@ -71,7 +71,9 @@ const purchase = async (req: Request, res: Response) => {
     const inventoryItemAvailableForPurchase = await inventoryItemRepo.findOneBy(
       {
         id,
-        price: LessThanOrEqual(user.ballance / amount),
+        price: LessThanOrEqual(
+          user.ballance - amount * inventoryItemToPurchase.price,
+        ),
       },
     );
 
