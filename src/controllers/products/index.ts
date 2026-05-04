@@ -46,7 +46,7 @@ const purchase = async (req: Request, res: Response) => {
 
   // Connect the query runner to the database and start the transaction
   await queryRunner.connect();
-  await queryRunner.startTransaction("SERIALIZABLE");
+  await queryRunner.startTransaction();
 
   try {
     const user = req.user;

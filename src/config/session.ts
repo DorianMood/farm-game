@@ -22,10 +22,10 @@ export default session({
   resave: false,
   proxy: process.env.NODE_ENV === "production",
   cookie: {
-    partitioned: true,
+    // partitioned: true,
     secure: process.env.NODE_ENV === "production",
     httpOnly: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    sameSite: "lax", // process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 90 * 24 * 60 * 60 * 1000, // 3 months
   },
 });
